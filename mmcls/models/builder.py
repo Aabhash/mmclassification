@@ -1,4 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from xml.parsers.expat import model
 from mmcv.cnn import MODELS as MMCV_MODELS
 from mmcv.cnn.bricks.registry import ATTENTION as MMCV_ATTENTION
 from mmcv.utils import Registry
@@ -10,6 +11,10 @@ NECKS = MODELS
 HEADS = MODELS
 LOSSES = MODELS
 CLASSIFIERS = MODELS
+LITTLE = MODELS
+BIG = MODELS
+TEST = MODELS
+
 
 ATTENTION = Registry('attention', parent=MMCV_ATTENTION)
 
@@ -36,3 +41,7 @@ def build_loss(cfg):
 
 def build_classifier(cfg):
     return CLASSIFIERS.build(cfg)
+
+
+def build_dynamic(cfg):
+    return TEST.build(cfg)
