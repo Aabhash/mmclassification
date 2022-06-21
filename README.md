@@ -193,3 +193,10 @@ This project is released under the [Apache 2.0 license](LICENSE).
 - [MMEditing](https://github.com/open-mmlab/mmediting): OpenMMLab image and video editing toolbox.
 - [MMGeneration](https://github.com/open-mmlab/mmgeneration): OpenMMLab image and video generative models toolbox.
 - [MMDeploy](https://github.com/open-mmlab/mmdeploy): OpenMMLab model deployment framework.
+
+
+## changed for example
+- configs/example.py write path of configs
+- configs/base/example.py path of model
+- mmcls/models/clasifier/__init__.py add ExampleClassifier to classifier
+- mmcls/models/clasifier/ExampleClassifier.py add ExampleClassifier to classifier
