@@ -100,7 +100,7 @@ def parse_args():
     args = parser.parse_args()
     if 'LOCAL_RANK' not in os.environ:
         os.environ['LOCAL_RANK'] = str(args.local_rank)
-
+    args.out = "test"
     assert args.metrics or args.out, \
         'Please specify at least one of output path and evaluation metrics.'
 
@@ -120,7 +120,7 @@ def main():
     # set cudnn_benchmark
     if cfg.get('cudnn_benchmark', False):
         torch.backends.cudnn.benchmark = True
-    cfg.model.pretrained = None
+    #cfg.model.pretrained = None
 
     if args.gpu_ids is not None:
         cfg.gpu_ids = args.gpu_ids[0:1]
@@ -169,7 +169,7 @@ def main():
     model = build_classifier(cfg.model)
     fp16_cfg = cfg.get('fp16', None)
     if fp16_cfg is not None:
-        wrap_fp16_model(model)
+        wrap_fp16_model(model)    
     checkpoint = load_checkpoint(model, args.checkpoint, map_location='cpu')
 
     if 'CLASSES' in checkpoint.get('meta', {}):
@@ -246,7 +246,7 @@ def main():
                     for key in args.out_items:
                         results[key] = res_items[key]
             print(f'\ndumping results to {args.out}')
-            mmcv.dump(results, args.out)
+            mmcv.dump(results, args.out,file_format='json')
 
 
 if __name__ == '__main__':
