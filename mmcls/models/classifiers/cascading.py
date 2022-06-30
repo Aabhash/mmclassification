@@ -1,13 +1,18 @@
+from cv2 import threshold
 from ..builder import CLASSIFIERS, build_backbone, build_head, build_neck
 from ..heads import MultiLabelClsHead
 from ..utils.augment import Augments
 from .base import BaseClassifier
 import torch
+import numpy as np
+import time 
+
+
+
 
 @CLASSIFIERS.register_module()
 class Cascading(BaseClassifier):
     # these are also the key words for the config
-    
     def __init__(self,
                  little,
                  little_head,
@@ -20,7 +25,8 @@ class Cascading(BaseClassifier):
                  pretrained_little = None,
                  pretrained_big = None,
                  beta = 0.85, # which denodes how much percentage sm from big is lesss important then from little
-                 init_cfg=None):
+                 init_cfg=None,
+                 train_cfg=None):
         super(Cascading, self).__init__(init_cfg)
         if pretrained_little is not None:
             self.init_cfg = dict(type='Pretrained', checkpoint=pretrained_little)
@@ -37,6 +43,11 @@ class Cascading(BaseClassifier):
         self.beta = beta
         self.PSI = 0
         self.PSI_delta = 0
+        self.augments = None
+        if train_cfg is not None:
+            augments_cfg = train_cfg.get('augments', None)
+            if augments_cfg is not None:
+                self.augments = Augments(augments_cfg)
     
     def extract_feat(self, img, network, neck = None, head=None):
         x = network(img)
@@ -47,74 +58,100 @@ class Cascading(BaseClassifier):
         return x
 
 
-    def forward_train(self, img,   **kwargs):
+    def forward_train(self, img, gt_label,   **kwargs):
         """
-            normaly we don't train the the models we only train the threshold
+            normaly we don't train the the models
         """
-        res = self.extract_feat(img,self.little,neck=self.little_neck,head=self.little_head)
-        res = self.little_head.simple_test(res)
-        score = torch.tensor(res).topk(2).values.transpose(1,0)
-        sm = score[0]- score[1]
-        mask = torch.nonzero((sm) < max(self.threshold, self.threshold + self.delta)) #need <
-        img = img[mask].squeeze()
-        if img.shape[0] > 0:
-            res_big = self.extract_feat(img,self.big, neck=self.big_neck, head=self.big_head)
-            score_big = torch.tensor(res).topk(2).values.transpose(1,0)
-            sm_big = score_big[0]- score_big[1]
-            #maybe there are more elegant ways
-            for (i, re) in zip(mask, res_big):
-                re = re.clone()
-                res[i] = re
-                sm[i] = sm_big[i]
-        if self.delta > 0:
-            self.PSI_delta = sm.sum()
-        else:
-            self.PSI = sm.sum()
-        if self.PSI > self.PSI_delta:
-            self.delta *= -0.5
-        elif self.PSI < self.PSI_delta:
-            self.threshold += self.delta
-        else:
-            self.threshold += self.delta
+        
+        if self.augments is not None:
+            img, gt_label = self.augments(img, gt_label)
 
-        return res
+        x_1 = self.extract_feat(img,self.little,neck=self.little_neck,head=self.little_head)
+
+        losses = dict()
+        loss_1 = self.little_head.forward_train(x_1, gt_label)
+
+        losses.update(loss_1)
+        if self.augments is not None:
+            img, gt_label = self.augments(img, gt_label)
+
+        x_2 = self.extract_feat(img,self.big,neck=self.big_neck,head=self.big_head)
+
+        losses = dict()
+        loss_2 = self.big_head.forward_train(x_2, gt_label)
+
+        losses.update(loss_2)
+
+        return losses    
+
+        
     
-    def simple_test(self, img,   **kwargs):
+    def simple_test(self, img, **kwargs):
         """
             normaly we don't train the the models we only train the threshold
         """
         res = self.extract_feat(img,self.little,neck=self.little_neck,head=self.little_head)
         res = self.little_head.simple_test(res)
-        score = torch.tensor(res).topk(2).values.transpose(1,0)
+        score = torch.tensor(np.array(res)).topk(2).values.transpose(1,0)
         sm = score[0]- score[1]
-        mask = torch.nonzero((sm) < max(self.threshold, self.threshold + self.delta)) #need <
+        mask = torch.nonzero((sm) < self.threshold) #need <
         im_shape = img.shape
-        img = img[mask]
-        if img.shape[0] > 0:
+        img_max = img[mask]
+        sm_max = sm
+        res_threshold = res
+        if img_max.shape[0] > 0:
+            
             #maybe this is different with different datasets
-            img = img.view(img.shape[0],im_shape[1],im_shape[2],im_shape[3])
-            res_big = self.extract_feat(img,self.big, neck=self.big_neck, head=self.big_head)
+            img_max = img_max.view(img_max.shape[0],im_shape[1],im_shape[2],im_shape[3])
+            res_big = self.extract_feat(img_max,self.big, neck=self.big_neck, head=self.big_head)
             res_big = self.big_head.simple_test(res_big)
-            score_big = torch.tensor(res).topk(2).values.transpose(1,0)
+            score_big = torch.tensor(np.array(res)).topk(2).values.transpose(1,0)
             sm_big = score_big[0]- score_big[1]
             #maybe there are more elegant ways
+            
             for (i, re) in zip(mask, res_big):
-                res[i] = re
-                sm[i] = sm_big[i]
+                res_threshold[i] = re
+                sm_max[i] = sm_big[i]
+        mask = torch.nonzero((sm) < (self.threshold + self.delta))
+        img_min = img[mask]
+        sm_min = sm
+        res_delta = res
+        if img_min.shape[0] > 0:
+            
+            #maybe this is different with different datasets
+            img_min = img_min.view(img_min.shape[0],im_shape[1],im_shape[2],im_shape[3])
+            res_big = self.extract_feat(img_min,self.big, neck=self.big_neck, head=self.big_head)
+            res_big = self.big_head.simple_test(res_big)
+            score_big = torch.tensor(np.array(res)).topk(2).values.transpose(1,0)
+            sm_big = score_big[0]- score_big[1]
+            #maybe there are more elegant ways
+            
+            for (i, re) in zip(mask, res_big):
+                res_delta[i] = re
+                sm_min[i] = sm_big[i]
+        res = res_delta if self.delta > 0 else  res_threshold
             #res = torch.tensor(res)
-        if self.delta > 0:
-            self.PSI_delta = sm.sum()
-        else:
-            self.PSI = sm.sum()
+        if self.threshold > 1: 
+            return res 
+            #because over 1 is not possible 
+      
+        self.PSI_delta = sm_max.sum()
+        self.PSI = sm_min.sum()
         if self.PSI > self.PSI_delta:
-            self.delta *= -0.5
-        elif self.PSI < self.PSI_delta:
-            self.threshold += self.delta
+           
+            self.delta = self.delta * -0.5
+        if self.PSI < self.PSI_delta:
+           
+            self.threshold = self.threshold + self.delta
+            self.delta = 1.2 * self.delta
         else:
-            self.threshold += self.delta
-        
+           
+            self.threshold = self.threshold + self.delta
+            self.delta = -self.delta
         return res
         
+
+   
 
     #def simple_test(self, img, **kwargs):
     #  res = self.extract_feat(img,self.little,neck=self.little_neck,head=self.little_head)

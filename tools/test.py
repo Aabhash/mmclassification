@@ -16,6 +16,7 @@ from mmcls.apis import multi_gpu_test, single_gpu_test
 from mmcls.datasets import build_dataloader, build_dataset
 from mmcls.models import build_classifier
 from mmcls.utils import get_root_logger, setup_multi_processes
+import time
 
 
 def parse_args():
@@ -100,7 +101,7 @@ def parse_args():
     args = parser.parse_args()
     if 'LOCAL_RANK' not in os.environ:
         os.environ['LOCAL_RANK'] = str(args.local_rank)
-    args.out = "test"
+    args.out = "test_resmet101"
     assert args.metrics or args.out, \
         'Please specify at least one of output path and evaluation metrics.'
 
@@ -199,6 +200,7 @@ def main():
                     'is not lower than v1.4.4'
         model.CLASSES = CLASSES
         show_kwargs = {} if args.show_options is None else args.show_options
+        start_time = time.time()
         outputs = single_gpu_test(model, data_loader, args.show, args.show_dir,
                                   **show_kwargs)
     else:
@@ -206,6 +208,7 @@ def main():
             model.cuda(),
             device_ids=[torch.cuda.current_device()],
             broadcast_buffers=False)
+        
         outputs = multi_gpu_test(model, data_loader, args.tmpdir,
                                  args.gpu_collect)
 
@@ -238,7 +241,8 @@ def main():
                     'class_scores': scores,
                     'pred_score': pred_score,
                     'pred_label': pred_label,
-                    'pred_class': pred_class
+                    'pred_class': pred_class,
+                    'time': time.time()-start_time
                 }
                 if 'all' in args.out_items:
                     results.update(res_items)

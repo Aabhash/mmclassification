@@ -6,10 +6,10 @@ from collections import OrderedDict
 
 def main(
     file_1 = "/home/till/mmclassification/pretrained_models/resnet18_b16x8_cifar10_20210528-bd6371c8.pth",
-    file_2 = "/home/till/mmclassification/pretrained_models/resnet50_b16x8_cifar10_20210528-f54bfad9.pth",
+    file_2 = "/home/till/mmclassification/pretrained_models/resnet101_b16x8_cifar10_20210528-2d29e936.pth",
     renames_1 = ["little", "little_head"],
     renames_2 = ["big", "big_head"],
-    save_new = "/home/till/mmclassification/pretrained_models/cascading_resnet18_resnet_50.pth"
+    save_new = "/home/till/mmclassification/pretrained_models/cascading_resnet18_resnet_101.pth"
 ):
     model_1 = torch.load(file_1)
     save_mode = model_1
