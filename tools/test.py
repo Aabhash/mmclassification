@@ -16,6 +16,7 @@ from mmcls.apis import multi_gpu_test, single_gpu_test
 from mmcls.datasets import build_dataloader, build_dataset
 from mmcls.models import build_classifier
 from mmcls.utils import get_root_logger, setup_multi_processes
+import time
 
 
 def parse_args():
@@ -100,7 +101,6 @@ def parse_args():
     args = parser.parse_args()
     if 'LOCAL_RANK' not in os.environ:
         os.environ['LOCAL_RANK'] = str(args.local_rank)
-
     assert args.metrics or args.out, \
         'Please specify at least one of output path and evaluation metrics.'
 
@@ -120,7 +120,7 @@ def main():
     # set cudnn_benchmark
     if cfg.get('cudnn_benchmark', False):
         torch.backends.cudnn.benchmark = True
-    cfg.model.pretrained = None
+    #cfg.model.pretrained = None
 
     if args.gpu_ids is not None:
         cfg.gpu_ids = args.gpu_ids[0:1]
@@ -164,12 +164,12 @@ def main():
     }
     # the extra round_up data will be removed during gpu/cpu collect
     data_loader = build_dataloader(dataset, **test_loader_cfg)
-
+   
     # build the model and load checkpoint
     model = build_classifier(cfg.model)
     fp16_cfg = cfg.get('fp16', None)
     if fp16_cfg is not None:
-        wrap_fp16_model(model)
+        wrap_fp16_model(model)    
     checkpoint = load_checkpoint(model, args.checkpoint, map_location='cpu')
 
     if 'CLASSES' in checkpoint.get('meta', {}):
@@ -180,7 +180,7 @@ def main():
         warnings.warn('Class names are not saved in the checkpoint\'s '
                       'meta data, use imagenet by default.')
         CLASSES = ImageNet.CLASSES
-
+    start_time = time.time()
     if not distributed:
         if args.device == 'cpu':
             model = model.cpu()
@@ -206,6 +206,7 @@ def main():
             model.cuda(),
             device_ids=[torch.cuda.current_device()],
             broadcast_buffers=False)
+        
         outputs = multi_gpu_test(model, data_loader, args.tmpdir,
                                  args.gpu_collect)
 
@@ -234,11 +235,14 @@ def main():
                 pred_score = np.max(scores, axis=1)
                 pred_label = np.argmax(scores, axis=1)
                 pred_class = [CLASSES[lb] for lb in pred_label]
+                print(test_loader_cfg)
                 res_items = {
                     'class_scores': scores,
                     'pred_score': pred_score,
                     'pred_label': pred_label,
-                    'pred_class': pred_class
+                    'pred_class': pred_class,
+                    'time': time.time()-start_time,
+                    'avg_time_batch': (time.time() -start_time) /(len(scores)/test_loader_cfg['samples_per_gpu']) #
                 }
                 if 'all' in args.out_items:
                     results.update(res_items)
@@ -246,7 +250,7 @@ def main():
                     for key in args.out_items:
                         results[key] = res_items[key]
             print(f'\ndumping results to {args.out}')
-            mmcv.dump(results, args.out)
+            mmcv.dump(results, args.out,file_format='json')
 
 
 if __name__ == '__main__':
