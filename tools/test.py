@@ -164,7 +164,7 @@ def main():
     }
     # the extra round_up data will be removed during gpu/cpu collect
     data_loader = build_dataloader(dataset, **test_loader_cfg)
-
+   
     # build the model and load checkpoint
     model = build_classifier(cfg.model)
     fp16_cfg = cfg.get('fp16', None)
@@ -180,7 +180,7 @@ def main():
         warnings.warn('Class names are not saved in the checkpoint\'s '
                       'meta data, use imagenet by default.')
         CLASSES = ImageNet.CLASSES
-
+    start_time = time.time()
     if not distributed:
         if args.device == 'cpu':
             model = model.cpu()
@@ -199,7 +199,6 @@ def main():
                     'is not lower than v1.4.4'
         model.CLASSES = CLASSES
         show_kwargs = {} if args.show_options is None else args.show_options
-        start_time = time.time()
         outputs = single_gpu_test(model, data_loader, args.show, args.show_dir,
                                   **show_kwargs)
     else:
@@ -236,12 +235,14 @@ def main():
                 pred_score = np.max(scores, axis=1)
                 pred_label = np.argmax(scores, axis=1)
                 pred_class = [CLASSES[lb] for lb in pred_label]
+                print(test_loader_cfg)
                 res_items = {
                     'class_scores': scores,
                     'pred_score': pred_score,
                     'pred_label': pred_label,
                     'pred_class': pred_class,
-                    'time': time.time()-start_time
+                    'time': time.time()-start_time,
+                    'avg_time_batch': (time.time() -start_time) /(len(scores)/test_loader_cfg['samples_per_gpu']) #
                 }
                 if 'all' in args.out_items:
                     results.update(res_items)
