@@ -16,21 +16,6 @@ class InitialLayer(nn.Module):
         super().__init__()
         self.layers = nn.ModuleList()
 
-        # self.layers.append(nn.Sequential(
-        #     nn.Conv2d(
-        #         in_c,
-        #         out_c,
-        #         kernel_size=3, 
-        #         stride=1,
-        #         padding=1, 
-        #         bias=False
-        #     ),
-        #     nn.BatchNorm2d(out_c),
-        #     nn.ReLU(inplace=True)
-        # ))
-
-        # in_c = copy.copy(out_c)
-
         for i in range(n_scales):
             stride = 1 if i == 0 else 2
             out_channel = out_c * (2**i)
@@ -102,7 +87,6 @@ class ConvBlock(nn.Module):
 class ConvUpSampleBlock(nn.Module):
     def __init__(self, in_c, in_c2, out_c, compress_factor, width, width2, down_type="same"):
         super().__init__()
-        layer = []
         reduce_c = int(torch.floor(torch.tensor(out_c * compress_factor)))
         end_c = out_c - reduce_c
         mid_c = min(in_c, width * end_c)
@@ -208,14 +192,15 @@ class DenseBlock(nn.Module):
                 )
             )
         if self.transition:
-            out_channels = torch.floor(torch.tensor(1 * self.rr * self.out_c))
+            out_channels = torch.floor(torch.tensor(1.0 * self.rr * self.out_c))
             self.transition_block = nn.Sequential(
                 nn.Conv2d(
                     self.out_c,
                     out_channels,
                     kernel_size=1,
                     stride=1,
-                    padding=0
+                    padding=0,
+                    bias=False
                 ),
                 nn.BatchNorm2d(out_channels),
                 nn.ReLU(True)
@@ -232,19 +217,29 @@ class DenseBlock(nn.Module):
             return all_output[-1], all_output
 
 
-class DenseFusionBlock(DenseBlock):
+class DenseFusionBlock(nn.Module):
     def __init__(self, nlayers, in_c, in_c_lf, growth_rate, reduction_rate, transition, compress_factor, bnwidth1, bnwidth2, down_type="same"):
+        super().__init__()
+        self.layers = nn.ModuleList()
+        self.nlayers = nlayers
+        self.gr = growth_rate
+        self.rr = reduction_rate
+        self.bnwidth = bnwidth1
+        self.in_c = in_c
+        self.transition = transition
+        
+        self.out_c = in_c + nlayers* growth_rate
+
         self.in_c_lf = in_c_lf
         self.compress_factor = compress_factor
         self.bnwidth2 = bnwidth2
         self.down_type = down_type
-        super().__init__(nlayers, in_c, growth_rate, reduction_rate, transition, bnwidth1)
+        # super().__init__(nlayers, in_c, growth_rate, reduction_rate, transition, bnwidth1)
         self._set_up_blocks()
-        
 
     def _set_up_blocks(self):
         self.type = "fusion"
-        for i in range(self.nlayers):
+        for i in range(self.nlayers - 1):
             self.layers.append(
                 ConvUpSampleBlock(
                     self.in_c + i * self.gr,
@@ -284,7 +279,7 @@ class DenseFusionBlock(DenseBlock):
         self.out_c += int(torch.floor(torch.tensor(self.out_c * self.compress_factor)))
 
         if self.transition:
-            out_channels = int(torch.floor(torch.tensor(1 * self.rr * self.out_c)))
+            out_channels = int(torch.floor(torch.tensor(1.0 * self.rr * self.out_c)))
             self.transition_block = nn.Sequential(
                 nn.Conv2d(
                     self.out_c,
@@ -322,6 +317,7 @@ class Classifier(nn.Module):
     def __init__(self, channel=3, cls_labels=10, size=128):
         super().__init__()
         self.model = nn.Sequential(
+            nn.Sequential(
                 nn.Conv2d(
                     channel,
                     size,
@@ -331,7 +327,8 @@ class Classifier(nn.Module):
                     bias=False
                 ),
                 nn.BatchNorm2d(size),
-                nn.ReLU(inplace=True),
+                nn.ReLU(inplace=True)),
+            nn.Sequential(
                 nn.Conv2d(
                     size,
                     size,
@@ -342,8 +339,9 @@ class Classifier(nn.Module):
                 ),
                 nn.BatchNorm2d(size),
                 nn.ReLU(inplace=True),
-                nn.AvgPool2d(2)
-            )
+            ),
+            nn.AvgPool2d(2)
+        )
         self.linear = nn.Linear(size, cls_labels)
     
     def forward(self, x):
@@ -355,7 +353,7 @@ class Classifier(nn.Module):
 class MultiScaleNet(BaseBackbone):
     def __init__(self,
         growth_rate = 32,
-        reduction_rate = 16,
+        reduction_rate = 0.5,
         compress_factor = 0.25,
         depths = [6, 12, 24, 16],
         channels = 16,
@@ -364,7 +362,7 @@ class MultiScaleNet(BaseBackbone):
         block_step = 2,
         stepmode = "even",
         step = 8,
-        bnwidth = [4, 2, 2, 1],
+        bnwidth = [4, 2, 1],
         cls_labels = 10,
     ):
         super().__init__()
@@ -396,9 +394,10 @@ class MultiScaleNet(BaseBackbone):
                 transition = False
 
                 for k in range(i):
-                    chk = torch.floor(torch.tensor(((k+1) * self.blocks_per_flow[i+1]) / i+1))
-                    if self.blocks_per_flow[i+1] == chk:
+                    chk = int(torch.floor(torch.tensor(((k+1) * self.blocks_per_flow[i+1]) / (i+1))))
+                    if block == chk:
                         transition = True
+                        break
 
                 if block > self.blocks_per_flow[i]:
                     
@@ -431,9 +430,9 @@ class MultiScaleNet(BaseBackbone):
                     
                     prev = self.blocks_per_flow[:i+1]
                     if block in prev[-(i):]:
-                        down = 'same'
-                    else:
                         down = 'down'
+                    else:
+                        down = 'same'
 
                     denseblock = DenseFusionBlock(
                         steps[block-1],
@@ -452,9 +451,11 @@ class MultiScaleNet(BaseBackbone):
                     for k in range(steps[block-1]+1):
                         out_c = (in_c + k * growth_rate)
                         out_channels.append(out_c)
-                    
+                    out_c += int(torch.floor(torch.tensor(out_c * compress_factor)))
+
                     if transition:
-                        out_c = torch.floor(torch.tensor(1.0 * reduction_rate * out_c))
+                        out_c = int(torch.floor(torch.tensor(1.0 * reduction_rate * out_c)))
+
                     out_channels.append(out_c)
                 
                 scale_flow.append(denseblock)
@@ -470,8 +471,6 @@ class MultiScaleNet(BaseBackbone):
             in_c_lfs = in_c_lf
             self.scale_flow_list.append(scale_flow)
 
-        self.n_exits = len(self.classifier)
-
         for sf in self.scale_flow_list:
             for m in sf.modules():
                 self._init_weights(m)
@@ -481,32 +480,37 @@ class MultiScaleNet(BaseBackbone):
                 self._init_weights(m)
 
     def _init_weights(self, layer):
-        if isinstance(layer, nn.Conv2d):
-            n = layer.kernel_size[0] * layer.kernel_size[1] * layer.out_channels
-            layer.weight.data.normal_(0, torch.sqrt(torch.tensor(2./n)))
+        if isinstance(layer, nn.Linear):
+            layer.bias.data.zero_()
+
         elif isinstance(layer, nn.BatchNorm2d):
             layer.weight.data.fill_(1)
             layer.bias.data.zero_()
-        elif isinstance(layer, nn.Linear):
-            layer.bias.data.zero_()
-
+        
+        elif isinstance(layer, nn.Conv2d):
+            n = layer.kernel_size[0] * layer.kernel_size[1] * layer.out_channels
+            layer.weight.data.normal_(0, torch.sqrt(torch.tensor(2./n)))
+        
     def forward(self, x):
         scales = self.init_layer(x)
 
-        out, lfs = [], []
+        out = []
+        lfs = []
         cls_id = 0
+
         for i in range(self.n_scales):
-            temp_out = scales[i]
+            temp_out = copy.copy(scales[i])
             temp_lfs = []
             block = 0
+        
             for j in range(self.blocks_per_flow[i+1]):
                 if self.scale_flow_list[i][j].type == "basic":
                     temp_out, temp_lf = self.scale_flow_list[i][j](temp_out)
+                    temp_lfs.append(temp_lf)
                 else:
                     temp_out, temp_lf = self.scale_flow_list[i][j](temp_out, lfs[j])
-                temp_lfs.append(temp_lf)
+                    temp_lfs.append(temp_lf)
                 block += 1
-
                 if block > self.blocks_per_flow[i]:
                     out.append(self.classifier[cls_id](temp_out))
                     cls_id += 1

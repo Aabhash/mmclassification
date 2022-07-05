@@ -4,7 +4,7 @@ model = dict(
     backbone=dict(
         type='MultiScaleNet',        
         growth_rate = 6,
-        reduction_rate = 8,
+        reduction_rate = 0.5,
         compress_factor = 0.25,
         depths = [6, 12, 24, 16],
         channels = 16,
@@ -13,7 +13,7 @@ model = dict(
         block_step = 2,
         stepmode = "even",
         step = 4,
-        bnwidth = [4, 2, 2, 1],
+        bnwidth = [4, 2, 1],
         cls_labels = 10,
     )
 )
