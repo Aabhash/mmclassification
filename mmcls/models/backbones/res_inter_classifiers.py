@@ -23,8 +23,6 @@ class res_inter_classifiers(nn.Module):
     
     """`A resnet with intermediate classifiers backbone.
 
-    The input for 
-
     Args:
         path_resnet: The path where the base resnet can be found
     """
@@ -133,6 +131,9 @@ class res_inter_classifiers(nn.Module):
 
         y2 = self.layer4(x)
         # [1, 10]
+
+        return y2
+
         return 0.5 * y1 + 0.5 * y2
 
     def forward_test(self, x):
