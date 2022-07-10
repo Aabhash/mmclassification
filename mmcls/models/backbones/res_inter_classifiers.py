@@ -2,7 +2,7 @@
 import torch.nn as nn
 from torch.hub import load_state_dict_from_url
 from torchvision.models.resnet import ResNet, Bottleneck
-from torch import load, save, sum # WIP: Not needed in final version I guess
+from torch import load, save, sum, max # WIP: Not needed in final version I guess
 from pathlib import Path
 from collections import OrderedDict
 
@@ -131,9 +131,7 @@ class res_inter_classifiers(nn.Module):
 
         y2 = self.layer4(x)
         # [1, 10]
-
-        return y2
-
+        return y1
         return 0.5 * y1 + 0.5 * y2
 
     def forward_test(self, x):
@@ -141,6 +139,9 @@ class res_inter_classifiers(nn.Module):
             x = self.layer1(x)
 
             y1 = self.earlyExit1(x)
+
+            if max(y1) > 0.8:
+                return y1
 
             # [1, 256, H/4, W/4]
             x = self.layer2(x)
@@ -150,7 +151,7 @@ class res_inter_classifiers(nn.Module):
 
             y2 = self.layer4(x)
             # [1, 10]
-            return y2
+            return y1
 
 
     # def forward(self, x):
