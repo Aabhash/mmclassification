@@ -47,16 +47,16 @@ data = dict(
 
 # he configuration file used to build the optimizer, support all optimizers in PyTorch.
 optimizer = dict(type='SGD',         # Optimizer type
-                lr=0.1,              # Learning rate of optimizers, see detail usages of the parameters in the documentation of PyTorch
+                lr=0.001,              # Learning rate of optimizers, see detail usages of the parameters in the documentation of PyTorch
                 momentum=0.9,        # Momentum
                 weight_decay=0.0001) # Weight decay of SGD
 # Config used to build the optimizer hook, refer to https://github.com/open-mmlab/mmcv/blob/master/mmcv/runner/hooks/optimizer.py#L8 for implementation details.
 optimizer_config = dict(grad_clip=None)  # Most of the methods do not use gradient clip
 # Learning rate scheduler config used to register LrUpdater hook
 lr_config = dict(policy='step',          # The policy of scheduler, also support CosineAnnealing, Cyclic, etc. Refer to details of supported LrUpdater from https://github.com/open-mmlab/mmcv/blob/master/mmcv/runner/hooks/lr_updater.py#L9.
-                 step=[30, 60, 90])      # Steps to decay the learning rate
+                 step=[10, 20, 30])      # Steps to decay the learning rate
 runner = dict(type='EpochBasedRunner',   # Type of runner to use (i.e. IterBasedRunner or EpochBasedRunner)
-            max_epochs=1)    # Runner that runs the workflow in total max_epochs. For IterBasedRunner use `max_iters`
+            max_epochs=30)    # Runner that runs the workflow in total max_epochs. For IterBasedRunner use `max_iters`
 
 # Config to set the checkpoint hook, Refer to https://github.com/open-mmlab/mmcv/blob/master/mmcv/runner/hooks/checkpoint.py for implementation.
 checkpoint_config = dict(interval=1)    # The save interval is 1
