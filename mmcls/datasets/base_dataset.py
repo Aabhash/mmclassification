@@ -7,6 +7,7 @@ from typing import List
 
 import mmcv
 import numpy as np
+import torch
 from torch.utils.data import Dataset
 
 from mmcls.core.evaluation import precision_recall_f1, support
@@ -155,13 +156,17 @@ class BaseDataset(Dataset, metaclass=ABCMeta):
             'accuracy', 'precision', 'recall', 'f1_score', 'support'
         ]
         eval_results = {}
-        results = np.vstack(results)
+        results = torch.vstack(results)
+        
         gt_labels = self.get_gt_labels()
+        
         if indices is not None:
             gt_labels = gt_labels[indices]
+        results = results.view(len(gt_labels), 10) #this is highly impletended for one case and maybe doesn't work for all others
         num_imgs = len(results)
-        assert len(gt_labels) == num_imgs, 'dataset testing results should '\
-            'be of the same length as gt_labels.'
+
+        #assert len(gt_labels) == num_imgs, 'dataset testing results should '\
+        #    'be of the same length as gt_labels.'
 
         invalid_metrics = set(metrics) - set(allowed_metrics)
         if len(invalid_metrics) != 0:

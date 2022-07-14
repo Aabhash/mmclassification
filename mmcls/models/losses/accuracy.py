@@ -52,7 +52,7 @@ def accuracy_torch(pred, target, topk=(1, ), thrs=0.):
     else:
         raise TypeError(
             f'thrs should be a number or tuple, but got {type(thrs)}.')
-
+    target = target.cuda()
     res = []
     maxk = max(topk)
     num = pred.size(0)

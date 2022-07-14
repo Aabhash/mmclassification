@@ -21,6 +21,7 @@ class EvalHook(BaseEvalHook):
 
     def _do_evaluate(self, runner):
         """perform evaluation and save ckpt."""
+
         results = self.test_fn(runner.model, self.dataloader)
         self.latest_results = results
         runner.log_buffer.output['eval_iter_num'] = len(self.dataloader)

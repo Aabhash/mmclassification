@@ -187,36 +187,13 @@ class DenseNet(BaseBackbone):
         init_cfg (dict, optional): Initialization config dict.
     """
     arch_settings = {
-        '121': {
-            'growth_rate': 32,
-            'depths': [6, 12, 24, 16],
-            'init_channels': 64,
-        },
-        '169': {
-            'growth_rate': 32,
-            'depths': [6, 12, 32, 32],
-            'init_channels': 64,
-        },
-        '201': {
-            'growth_rate': 32,
-            'depths': [6, 12, 48, 32],
-            'init_channels': 64,
-        },
-        '161': {
-            'growth_rate': 48,
-            'depths': [6, 12, 36, 24],
-            'init_channels': 96,
-        },
+    
         'expert': {
             'growth_rate': 64,
             'depths': [3],
             'init_channels': 64
         },
-        'gate': {
-            'growth_rate': 64,
-            'depths': [2],
-            'init_channels': 64
-        },
+       
 
     }
 
