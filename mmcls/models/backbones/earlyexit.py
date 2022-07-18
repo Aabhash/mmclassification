@@ -528,7 +528,7 @@ class BranchyNet(nn.Module):
 #         y = self.earlyExit2(x)
 
 def mask_down(t: Tensor, mask: Tensor) -> Tensor:
-    return t[mask.bool()]
+    return t[mask.bool()].to(device='cuda')
 
 def mask_up(t: Tensor, mask: Tensor) -> Tensor:
 
@@ -548,7 +548,7 @@ def mask_up(t: Tensor, mask: Tensor) -> Tensor:
             output[j, :] = t[i, :]
             i += 1
 
-    return output
+    return output.to(device='cuda')
 
     
     
