@@ -1,5 +1,5 @@
 # Copyright (c) Carl. All rights reserved.
-from torch import Tensor, zeros, ones
+from torch import Tensor, zeros, ones, device
 import torch.nn as nn
 from torch.hub import load_state_dict_from_url
 from torchvision.models.resnet import ResNet, Bottleneck
@@ -258,8 +258,8 @@ class BranchyNet(nn.Module):
     def forward_test(self, x: Tensor)-> Tensor:
 
         bs = x.size()[0]
-        y = zeros(bs, 10)
-        Mask_Pass_On = ones(bs).bool()
+        y = zeros(bs, 10, device=device('cuda'))
+        Mask_Pass_On = ones(bsdevice=device('cuda')).bool()
         x = self.layer1(x)
 
         if self.activated_branches[0]:
