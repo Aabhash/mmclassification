@@ -293,7 +293,7 @@ class BranchyNet(nn.Module):
                 # If there are further exits we have to sort the bad results out
                 if (self.activated_branches[-1]):
                     y_exitTwo = y_exitTwo * Mask_exitTwo
-                
+                    print(y.get_device(), y_exitTwo.get_device())
                 y += y_exitTwo    
 
                 Mask_Pass_On = mask_up(Mask_exitTwo, Mask_Pass_On).reshape(-1)
