@@ -34,7 +34,7 @@ from .twins import PCPVT, SVT
 from .van import VAN
 from .vgg import VGG
 from .vision_transformer import VisionTransformer
-from .res_inter_classifiers import res_inter_classifiers
+from .earlyexit import BranchyNet
 
 
 __all__ = [
@@ -45,5 +45,5 @@ __all__ = [
     'Conformer', 'MlpMixer', 'DistilledVisionTransformer', 'PCPVT', 'SVT',
     'EfficientNet', 'ConvNeXt', 'HRNet', 'ResNetV1c', 'ConvMixer',
     'CSPDarkNet', 'CSPResNet', 'CSPResNeXt', 'CSPNet', 'RepMLPNet',
-    'PoolFormer', 'DenseNet', 'VAN', 'res_inter_classifiers'
+    'PoolFormer', 'DenseNet', 'VAN', 'BranchyNet'
 ]

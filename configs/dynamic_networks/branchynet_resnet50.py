@@ -1,10 +1,11 @@
 model = dict(
     type='ImageClassifier',
     backbone=dict(
-        type='res_inter_classifiers'),
+        type='BranchyNet',
+        activated_branches=[True, True, True]),
     head=dict(
         type='emptyClsHead',     # linear classification head，
-        loss=dict(type='CrossEntropyLoss', loss_weight=1.0), # Loss function configuration information
+        loss=dict(type='BranchyNetLoss'), # Loss function configuration information
         topk=(1, 5),              # Evaluation index, Top-k accuracy rate, here is the accuracy rate of top1 and top5
     )
         
