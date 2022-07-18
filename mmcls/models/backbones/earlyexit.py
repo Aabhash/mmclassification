@@ -259,7 +259,7 @@ class BranchyNet(nn.Module):
 
         bs = x.size()[0]
         y = zeros(bs, 10, device=device('cuda'))
-        Mask_Pass_On = ones(bsdevice=device('cuda')).bool()
+        Mask_Pass_On = ones(bs, device=device('cuda')).bool()
         x = self.layer1(x)
 
         if self.activated_branches[0]:
