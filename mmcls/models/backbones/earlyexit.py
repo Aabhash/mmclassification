@@ -236,6 +236,7 @@ class BranchyNet(nn.Module):
         )
 
     def forward(self, img, return_loss=False):
+        img = img.to(device='cuda')
 
         if return_loss:
             return self.forward_train(img)
