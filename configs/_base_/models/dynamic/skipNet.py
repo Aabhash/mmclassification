@@ -5,7 +5,7 @@ model = dict(
     type='ImageClassifier',
     backbone=dict(
         type='ResNetFeedForwardSP',
-        layers=[6,6,6],
+        layers=[8,8,8],
         gate_type= 'ffgate1'
         ),
    
