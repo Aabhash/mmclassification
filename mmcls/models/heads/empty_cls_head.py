@@ -21,3 +21,6 @@ class emptyClsHead(ClsHead):
         cls_score = self.id(x)
         losses = self.loss(cls_score, gt_label)
         return losses
+
+    def simple_test(self, x, softmax=False, post_process=False):
+        return self.id(x)
