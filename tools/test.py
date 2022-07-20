@@ -138,7 +138,8 @@ def main():
         distributed = True
         init_dist(args.launcher, **cfg.dist_params)
 
-    dataset = build_dataset(cfg.data.test, default_args=dict(test_mode=True))
+    dataset = build_dataset(cfg.data.val, default_args=dict(
+        test_mode=True))  # this also have to be discussed
 
     # build the dataloader
     # The default loader config
@@ -164,12 +165,13 @@ def main():
     }
     # the extra round_up data will be removed during gpu/cpu collect
     data_loader = build_dataloader(dataset, **test_loader_cfg)
-   
+
     # build the model and load checkpoint
     model = build_classifier(cfg.model)
+    model_object = model
     fp16_cfg = cfg.get('fp16', None)
     if fp16_cfg is not None:
-        wrap_fp16_model(model)    
+        wrap_fp16_model(model)
     checkpoint = load_checkpoint(model, args.checkpoint, map_location='cpu')
 
     if 'CLASSES' in checkpoint.get('meta', {}):
@@ -206,11 +208,13 @@ def main():
             model.cuda(),
             device_ids=[torch.cuda.current_device()],
             broadcast_buffers=False)
-        
+
         outputs = multi_gpu_test(model, data_loader, args.tmpdir,
                                  args.gpu_collect)
 
     rank, _ = get_dist_info()
+    if True:
+        masks = model_object.special_metrics
     if rank == 0:
         results = {}
         logger = get_root_logger()
@@ -242,15 +246,17 @@ def main():
                     'pred_label': pred_label,
                     'pred_class': pred_class,
                     'time': time.time()-start_time,
-                    'avg_time_batch': (time.time() -start_time) /(len(scores)/test_loader_cfg['samples_per_gpu']) #
+                    'avg_time_batch': (time.time() - start_time) / (len(scores)/test_loader_cfg['samples_per_gpu'])
                 }
+                if True:  # TODO define args to deside
+                    pass
                 if 'all' in args.out_items:
                     results.update(res_items)
                 else:
                     for key in args.out_items:
                         results[key] = res_items[key]
             print(f'\ndumping results to {args.out}')
-            mmcv.dump(results, args.out,file_format='json')
+            mmcv.dump(results, args.out, file_format='json')
 
 
 if __name__ == '__main__':

@@ -1,4 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from tokenize import Special
 from ..builder import CLASSIFIERS, build_backbone, build_head, build_neck
 from ..heads import MultiLabelClsHead
 from ..utils.augment import Augments
@@ -6,7 +7,7 @@ from .base import BaseClassifier
 
 
 @CLASSIFIERS.register_module()
-class ImageClassifier(BaseClassifier):
+class ImageClassifier_dynamic(BaseClassifier):
 
     def __init__(self,
                  backbone,
@@ -14,8 +15,9 @@ class ImageClassifier(BaseClassifier):
                  head=None,
                  pretrained=None,
                  train_cfg=None,
+                 special=None,
                  init_cfg=None):
-        super(ImageClassifier, self).__init__(init_cfg)
+        super(ImageClassifier_dynamic, self).__init__(init_cfg)
 
         if pretrained is not None:
             self.init_cfg = dict(type='Pretrained', checkpoint=pretrained)
@@ -26,7 +28,8 @@ class ImageClassifier(BaseClassifier):
 
         if head is not None:
             self.head = build_head(head)
-
+        self.special = special
+        self.special_metrics = []
         self.augments = None
         if train_cfg is not None:
             augments_cfg = train_cfg.get('augments', None)
@@ -149,5 +152,7 @@ class ImageClassifier(BaseClassifier):
                 'Please use `sigmoid` instead of `softmax` '
                 'in multi-label tasks.')
         res = self.head.simple_test(x, **kwargs)
-      
+        if self.special == 'skip':
+            self.special_metrics.append(self.backbone.masks)
+
         return res
