@@ -4,7 +4,7 @@ from numpy import block
 model = dict(
     type='ImageClassifier',
     backbone=dict(
-        type='ResNetFeedForwardSP',
+        type='ResNetFeedForwardRL',
         layers=[2,2,2,2],
         gate_type= 'ffgate1'
         ),
@@ -19,6 +19,3 @@ model = dict(
 
   
 )
-"""
-    
-"""

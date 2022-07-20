@@ -34,7 +34,7 @@ from .twins import PCPVT, SVT
 from .van import VAN
 from .vgg import VGG
 from .vision_transformer import VisionTransformer
-from .skipnet import ResNetFeedForwardSP
+from .skipnet import ResNetFeedForwardSP, 
 
 
 __all__ = [

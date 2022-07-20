@@ -55,7 +55,7 @@ class FeedforwardGateI(BaseModule):
         self.pool_size = pool_size
         self.channel = channel
 
-        self.maxpool = nn.MaxPool2d(2)
+        self.maxpool = nn.MaxPool2d(4)
         self.conv1 = conv3x3(channel, channel)
         self.bn1 = nn.BatchNorm2d(channel)
         self.relu1 = nn.ReLU(inplace=True)
@@ -108,7 +108,7 @@ class SoftGateI(BaseModule):
         self.pool_size = pool_size
         self.channel = channel
 
-        self.maxpool = nn.MaxPool2d(2)
+        self.maxpool = nn.MaxPool2d(4)
         self.conv1 = conv3x3(channel, channel)
         self.bn1 = nn.BatchNorm2d(channel)
         self.relu1 = nn.ReLU(inplace=True)
@@ -188,40 +188,7 @@ class FeedforwardGateII(BaseModule):
         return x, logprob
 
 
-class SoftGateII(BaseModule):
-    """ Soft gating version of FFGate-II"""
-    def __init__(self, pool_size=5, channel=10):
-        super(SoftGateII, self).__init__()
-        self.pool_size = pool_size
-        self.channel = channel
 
-        self.conv1 = conv3x3(channel, channel, stride=2)
-        self.bn1 = nn.BatchNorm2d(channel)
-        self.relu1 = nn.ReLU(inplace=True)
-
-        pool_size = math.floor(pool_size / 2 + 0.5)  # for conv stride = 2
-
-        self.avg_layer = nn.AvgPool2d(pool_size)
-        self.linear_layer = nn.Conv2d(in_channels=channel, out_channels=2,
-                                      kernel_size=1, stride=1)
-        self.prob_layer = nn.Softmax()
-        self.logprob = nn.LogSoftmax()
-
-    def forward(self, x):
-        x = self.conv1(x)
-        x = self.bn1(x)
-        x = self.relu1(x)
-
-        x = self.avg_layer(x)
-        x = self.linear_layer(x).squeeze()
-        softmax = self.prob_layer(x)
-        logprob = self.logprob(x)
-
-        x = softmax[:, 1].contiguous()
-        x = x.view(x.size(0), 1, 1, 1)
-        if not self.training:
-            x = (x > 0.5).float()
-        return x, logprob
 
 @BACKBONES.register_module()
 class ResNetFeedForwardSP(BaseBackbone):
@@ -230,28 +197,24 @@ class ResNetFeedForwardSP(BaseBackbone):
 
     def __init__(self, layers, num_classes=10,
                  gate_type='fisher', **kwargs):
-        self.inplanes = 16
+        self.inplanes = 64
         super(ResNetFeedForwardSP, self).__init__()
 
         self.num_layers = layers
-        self.conv1 = conv3x3(3, 16)
-        self.bn1 = nn.BatchNorm2d(16)
+        self.conv1 =  self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
+                               bias=False)
+        self.bn1 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU(inplace=True)
-
-        # going to have 3 groups of layers. For the easiness of skipping,
-        # We are going to break the sequential of layers into a list of layers.
+        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        
         block = BasicBlock
         self.gate_type = gate_type
-        self._make_group(block, 16, layers[0], group_id=1,
-                         gate_type=gate_type, pool_size=32)
-        self._make_group(block, 32, layers[1], group_id=2,
-                         gate_type=gate_type, pool_size=16)
-        self._make_group(block, 64, layers[2], group_id=3,
-                         gate_type=gate_type, pool_size=8)
-
-        self.avgpool = nn.AvgPool2d(8)
-        #self.fc = nn.Linear(64 * block.expansion, num_classes)
-
+        self._make_group(block, 64, layers[0],gate_type=gate_type, group_id=1, pool_size=56)
+        self._make_group(block, 128, layers[1],gate_type=gate_type, group_id=2, pool_size=28)
+        self._make_group(block, 256, layers[2], gate_type = gate_type, group_id=3, pool_size=14)
+        self._make_group(block, 512, layers[3],  gate_type = gate_type, group_id=4, pool_size=7)
+        self.avgpool = nn.AvgPool2d(7)
+        
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
@@ -300,12 +263,6 @@ class ResNetFeedForwardSP(BaseBackbone):
         elif gate_type == 'ffgate2':
             gate_layer = FeedforwardGateII(pool_size=pool_size,
                                            channel=planes*block.expansion)
-        elif gate_type == 'softgate1':
-            gate_layer = SoftGateI(pool_size=pool_size,
-                                   channel=planes*block.expansion)
-        elif gate_type == 'softgate2':
-            gate_layer = SoftGateII(pool_size=pool_size,
-                                    channel=planes*block.expansion)
         else:
             gate_layer = None
 
@@ -332,8 +289,9 @@ class ResNetFeedForwardSP(BaseBackbone):
         gprobs.append(gprob)
         masks.append(mask.squeeze())
         prev = x  # input of next layer
-
+        #going through the blocks
         for g in range(3):
+            #going through the layers
             for i in range(0 + int(g == 0), self.num_layers[g]):
                 if getattr(self, 'group{}_ds{}'.format(g+1, i)) is not None:
                     prev = getattr(self, 'group{}_ds{}'.format(g+1, i))(prev)
@@ -353,5 +311,103 @@ class ResNetFeedForwardSP(BaseBackbone):
         return x, masks, gprobs
 
 
+class RLFeedforwardGateI(nn.Module):
+    """ FFGate-I with sampling. Use Pytorch 2.0"""
+    def __init__(self, pool_size=5, channel=10):
+        super(RLFeedforwardGateI, self).__init__()
+        self.pool_size = pool_size
+        self.channel = channel
+
+        self.maxpool = nn.MaxPool2d(2)
+        self.conv1 = conv3x3(channel, channel)
+        self.bn1 = nn.BatchNorm2d(channel)
+        self.relu1 = nn.ReLU(inplace=True)
+
+        # adding another conv layer
+        self.conv2 = conv3x3(channel, channel, stride=2)
+        self.bn2 = nn.BatchNorm2d(channel)
+        self.relu2 = nn.ReLU(inplace=True)
+
+        pool_size = math.floor(pool_size/2)  # for max pooling
+        pool_size = math.floor(pool_size/2 + 0.5)  # for conv stride = 2
+
+        self.avg_layer = nn.AvgPool2d(pool_size)
+        self.linear_layer = nn.Conv2d(in_channels=channel, out_channels=2,
+                                      kernel_size=1, stride=1)
+        self.prob_layer = nn.Softmax()
+
+        # saved actions and rewards
+        self.saved_action = []
+        self.rewards = []
+
+    def forward(self, x):
+        x = self.maxpool(x)
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.relu1(x)
+
+        x = self.conv2(x)
+        x = self.bn2(x)
+        x = self.relu2(x)
+
+        x = self.avg_layer(x)
+        x = self.linear_layer(x).squeeze()
+        softmax = self.prob_layer(x)
+
+        if self.training:
+            action = softmax.multinomial()
+            self.saved_action = action
+        else:
+            action = (softmax[:, 1] > 0.5).float()
+            self.saved_action = action
+
+        action = action.view(action.size(0), 1, 1, 1).float()
+        return action, softmax
 
 
+class RLFeedforwardGateII(nn.Module):
+    def __init__(self, pool_size=5, channel=10):
+        super(RLFeedforwardGateII, self).__init__()
+        self.pool_size = pool_size
+        self.channel = channel
+
+        self.conv1 = conv3x3(channel, channel, stride=2)
+        self.bn1 = nn.BatchNorm2d(channel)
+        self.relu1 = nn.ReLU(inplace=True)
+
+        pool_size = math.floor(pool_size/2 + 0.5)  # for conv stride = 2
+
+        self.avg_layer = nn.AvgPool2d(pool_size)
+        self.linear_layer = nn.Conv2d(in_channels=channel, out_channels=2,
+                                      kernel_size=1, stride=1)
+        self.prob_layer = nn.Softmax()
+
+        # saved actions and rewards
+        self.saved_action = None
+        self.rewards = []
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.relu1(x)
+
+        x = self.avg_layer(x)
+        x = self.linear_layer(x).squeeze()
+        softmax = self.prob_layer(x)
+
+        if self.training:
+            action = softmax.multinomial()
+            self.saved_action = action
+        else:
+            action = (softmax[:, 1] > 0.5).float()
+            self.saved_action = action
+
+        action = action.view(action.size(0), 1, 1, 1).float()
+        return action, softmax
+# For Recurrent Gate
+def repackage_hidden(h):
+    """ to reduce memory usage"""
+    if type(h) == Variable:
+        return Variable(h.data)
+    else:
+        return tuple(repackage_hidden(v) for v in h)
