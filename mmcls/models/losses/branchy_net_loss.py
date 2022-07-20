@@ -27,9 +27,10 @@ class BranchyNetLoss(nn.Module):
         '''When training BranchyNet we face one Tensor for each Exit.'''
         # print("Loss")
         # pdb.set_trace()
+        loss = 0.0
         if isinstance(pred, list):
-            print(loss)
             for exit in pred:
+                print(loss)
                 loss += branchy_net_loss(exit, target)
             return loss
         

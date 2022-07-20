@@ -245,8 +245,6 @@ class BranchyNet(nn.Module):
             return self.forward_test(img)
 
     def forward_train(self, x: Tensor) -> Tensor:
-        print("Backbone")
-        pdb.set_trace()
         x = self.layer1(x)
         y1 = self.earlyExit1(x)
         x = self.layer2(x)
