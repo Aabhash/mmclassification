@@ -1,8 +1,10 @@
+" This Configuration File represents a ResNet-50, i.e. a BranchyNet with only the final exit activated."
+
 model = dict(
-    type='EarlyExitClassifier',
+    type='ImageClassifier',
     backbone=dict(
         type='BranchyNet',
-        activated_branches=[True, True, True]),
+        activated_branches=[False, False, True]),
     head=dict(
         type='emptyClsHead',     # linear classification head，
         loss=dict(type='BranchyNetLoss'), # Loss function configuration information

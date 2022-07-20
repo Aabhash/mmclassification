@@ -1,8 +1,10 @@
+" This Configuration File represents a 1-0-0-BranchyNet, i.e. a BranchyNet with only the first exit activated."
+
 model = dict(
-    type='EarlyExitClassifier',
+    type='ImageClassifier',
     backbone=dict(
         type='BranchyNet',
-        activated_branches=[True, True, True]),
+        activated_branches=[True, False, False]),
     head=dict(
         type='emptyClsHead',     # linear classification head，
         loss=dict(type='BranchyNetLoss'), # Loss function configuration information

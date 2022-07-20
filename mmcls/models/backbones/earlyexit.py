@@ -235,7 +235,7 @@ class BranchyNet(nn.Module):
             nn.Softmax(dim=1)
         )
 
-    def forward(self, img, return_loss=True):
+    def forward(self, img, return_loss):
         if cuda.is_available():
             img = img.to(device='cuda')
 
