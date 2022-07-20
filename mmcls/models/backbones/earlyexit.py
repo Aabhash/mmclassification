@@ -1,5 +1,5 @@
 # Copyright (c) Carl. All rights reserved.
-from torch import Tensor, zeros, ones, device
+from torch import Tensor, zeros, ones, device, cuda, logical_and, logical_not
 import torch.nn as nn
 from torch.hub import load_state_dict_from_url
 from torchvision.models.resnet import ResNet, Bottleneck
@@ -235,8 +235,9 @@ class BranchyNet(nn.Module):
             nn.Softmax(dim=1)
         )
 
-    def forward(self, img, return_loss=False):
-        img = img.to(device='cuda')
+    def forward(self, img, return_loss=True):
+        if cuda.is_available():
+            img = img.to(device='cuda')
 
         if return_loss:
             return self.forward_train(img)
@@ -244,7 +245,8 @@ class BranchyNet(nn.Module):
             return self.forward_test(img)
 
     def forward_train(self, x: Tensor) -> Tensor:
-        
+        print("Backbone")
+        pdb.set_trace()
         x = self.layer1(x)
         y1 = self.earlyExit1(x)
         x = self.layer2(x)
@@ -256,10 +258,14 @@ class BranchyNet(nn.Module):
     
 
     def forward_test(self, x: Tensor)-> Tensor:
-
         bs = x.size()[0]
-        y = zeros(bs, 10, device=device('cuda'))
-        Mask_Pass_On = ones(bs, device=device('cuda')).bool()
+        y = zeros(bs, 10)
+        Mask_Pass_On = ones(bs).bool()
+
+        if cuda.is_available():
+            y = y.to(device='cuda')
+            Mask_Pass_On.to(device='cuda')
+
         x = self.layer1(x)
 
         if self.activated_branches[0]:
@@ -292,11 +298,14 @@ class BranchyNet(nn.Module):
                 
                 # If there are further exits we have to sort the bad results out
                 if (self.activated_branches[-1]):
-                    y_exitTwo = (y_exitTwo * Mask_exitTwo).to(device='cuda')
+                    y_exitTwo = (y_exitTwo * Mask_exitTwo)
+                    if cuda.is_available():
+                        y_exitTwo = y_exitTwo.to(device='cuda')
                     # print(y.get_device(), y_exitTwo.get_device())
                 y += y_exitTwo    
-
-                Mask_Pass_On = mask_up(Mask_exitTwo, Mask_Pass_On).reshape(-1)
+                
+                Mask_Pass_On = logical_and(logical_not(Mask_exitTwo), Mask_Pass_On.reshape(-1, 1)).reshape(-1)
+                # Mask_Pass_On -= mask_up(Mask_exitTwo, Mask_Pass_On).reshape(-1)
 
             if self.activated_branches[-1]:
                 x = mask_down(x, Mask_Pass_On)
@@ -528,7 +537,10 @@ class BranchyNet(nn.Module):
 #         y = self.earlyExit2(x)
 
 def mask_down(t: Tensor, mask: Tensor) -> Tensor:
-    return t[mask.bool()].to(device='cuda')
+    if cuda.is_available(): 
+        return t[mask.bool()].to(device='cuda')
+
+    return t[mask.bool()]
 
 def mask_up(t: Tensor, mask: Tensor) -> Tensor:
 
@@ -547,8 +559,9 @@ def mask_up(t: Tensor, mask: Tensor) -> Tensor:
         if mask_as_list[j]:
             output[j, :] = t[i, :]
             i += 1
-
-    return output.to(device='cuda')
+    if cuda.is_available():
+        return output.to(device='cuda')
+    return output
 
     
     
