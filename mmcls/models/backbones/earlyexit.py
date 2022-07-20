@@ -253,8 +253,10 @@ class BranchyNet(nn.Module):
         y3 = self.layer4(x)
 
         return [y1, y2, y3]
-    
 
+    def simple_test(self, x: Tensor) -> Tensor:
+        return forward_test(self, x)
+    
     def forward_test(self, x: Tensor)-> Tensor:
         bs = x.size()[0]
         y = zeros(bs, 10)
