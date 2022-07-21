@@ -47,9 +47,12 @@ def conv3x3(in_planes, out_planes, stride=1):
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
                      padding=1, bias=False)
 # Feedforward-Gate (FFGate-I)
+
+
 class FeedforwardGateI(BaseModule):
     """ Use Max Pooling First and then apply to multiple 2 conv layers.
     The first conv has stride = 1 and second has stride = 2"""
+
     def __init__(self, pool_size=5, channel=10):
         super(FeedforwardGateI, self).__init__()
         self.pool_size = pool_size
@@ -103,6 +106,7 @@ class SoftGateI(BaseModule):
     """This module has the same structure as FFGate-I.
     In training, adopt continuous gate output. In inference phase,
     use discrete gate outputs"""
+
     def __init__(self, pool_size=5, channel=10):
         super(SoftGateI, self).__init__()
         self.pool_size = pool_size
@@ -153,6 +157,7 @@ class SoftGateI(BaseModule):
 # FFGate-II
 class FeedforwardGateII(BaseModule):
     """ use single conv (stride=2) layer only"""
+
     def __init__(self, pool_size=5, channel=10):
         super(FeedforwardGateII, self).__init__()
         self.pool_size = pool_size
@@ -162,13 +167,13 @@ class FeedforwardGateII(BaseModule):
         self.bn1 = nn.BatchNorm2d(channel)
         self.relu1 = nn.ReLU(inplace=True)
 
-        pool_size = math.floor(pool_size/2 + 0.5) # for conv stride = 2
+        pool_size = math.floor(pool_size/2 + 0.5)  # for conv stride = 2
 
         self.avg_layer = nn.AvgPool2d(pool_size)
         self.linear_layer = nn.Conv2d(in_channels=channel, out_channels=2,
                                       kernel_size=1, stride=1)
-        self.prob_layer = nn.Softmax()
-        self.logprob = nn.LogSoftmax()
+        self.prob_layer = nn.Softmax(dim=1)
+        self.logprob = nn.LogSoftmax(dim=1)
 
     def forward(self, x):
         x = self.conv1(x)
@@ -188,8 +193,6 @@ class FeedforwardGateII(BaseModule):
         return x, logprob
 
 
-
-
 @BACKBONES.register_module()
 class ResNetFeedForwardSP(BaseBackbone):
     """ SkipNets with Feed-forward Gates for Supervised Pre-training stage.
@@ -201,20 +204,24 @@ class ResNetFeedForwardSP(BaseBackbone):
         super(ResNetFeedForwardSP, self).__init__()
 
         self.num_layers = layers
-        self.conv1 =  self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
-                               bias=False)
+        self.conv1 = self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
+                                            bias=False)
         self.bn1 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        
+
         block = BasicBlock
         self.gate_type = gate_type
-        self._make_group(block, 64, layers[0],gate_type=gate_type, group_id=1, pool_size=56)
-        self._make_group(block, 128, layers[1],gate_type=gate_type, group_id=2, pool_size=28)
-        self._make_group(block, 256, layers[2], gate_type = gate_type, group_id=3, pool_size=14)
-        self._make_group(block, 512, layers[3],  gate_type = gate_type, group_id=4, pool_size=7)
+        self._make_group(
+            block, 64, layers[0], gate_type=gate_type, group_id=1, pool_size=56)
+        self._make_group(
+            block, 128, layers[1], gate_type=gate_type, group_id=2, pool_size=28)
+        self._make_group(
+            block, 256, layers[2], gate_type=gate_type, group_id=3, pool_size=14)
+        self._make_group(
+            block, 512, layers[3],  gate_type=gate_type, group_id=4, pool_size=7)
         self.avgpool = nn.AvgPool2d(7)
-        
+
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
@@ -289,15 +296,15 @@ class ResNetFeedForwardSP(BaseBackbone):
         gprobs.append(gprob)
         masks.append(mask.squeeze())
         prev = x  # input of next layer
-        #going through the blocks
+        # going through the blocks
         for g in range(3):
-            #going through the layers
+            # going through the layers
             for i in range(0 + int(g == 0), self.num_layers[g]):
                 if getattr(self, 'group{}_ds{}'.format(g+1, i)) is not None:
                     prev = getattr(self, 'group{}_ds{}'.format(g+1, i))(prev)
                 x = getattr(self, 'group{}_layer{}'.format(g+1, i))(x)
                 prev = x = mask.expand_as(x) * x \
-                           + (1 - mask).expand_as(prev) * prev
+                    + (1 - mask).expand_as(prev) * prev
                 mask, gprob = getattr(self, 'group{}_gate{}'.format(g+1, i))(x)
                 gprobs.append(gprob)
                 masks.append(mask.squeeze())
@@ -307,12 +314,13 @@ class ResNetFeedForwardSP(BaseBackbone):
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
         #x = self.fc(x)
-        return x 
+        return x
         return x, masks, gprobs
 
 
 class RLFeedforwardGateI(nn.Module):
     """ FFGate-I with sampling. Use Pytorch 2.0"""
+
     def __init__(self, pool_size=5, channel=10):
         super(RLFeedforwardGateI, self).__init__()
         self.pool_size = pool_size
@@ -405,6 +413,8 @@ class RLFeedforwardGateII(nn.Module):
         action = action.view(action.size(0), 1, 1, 1).float()
         return action, softmax
 # For Recurrent Gate
+
+
 def repackage_hidden(h):
     """ to reduce memory usage"""
     if type(h) == Variable:
