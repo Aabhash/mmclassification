@@ -258,6 +258,9 @@ class BranchyNet(nn.Module):
         return forward_test(self, x)
     
     def forward_test(self, x: Tensor)-> Tensor:
+
+        pdb.set_trace()
+
         bs = x.size()[0]
         y = zeros(bs, 10)
         Mask_Pass_On = ones(bs).bool()
@@ -268,10 +271,12 @@ class BranchyNet(nn.Module):
 
         x = self.layer1(x)
 
+        # 1 2 3 4 5 6 7 
+
         if self.activated_branches[0]:
             y_exitOne = self.earlyExit1(x)
             
-            Mask_exitOne = max(y_exitOne, axis=1)[0] >= 0.75
+            Mask_exitOne = max(y_exitOne, axis=1)[0] >= 0.15
             Mask_exitOne = Mask_exitOne.reshape(-1, 1)
             
             # If there are further exits we have to sort the bad results out
@@ -283,32 +288,40 @@ class BranchyNet(nn.Module):
             # Invert the mask and reshape it
             Mask_Pass_On = (Mask_exitOne < .5).reshape(-1)
 
-            x = mask_down(x, Mask_Pass_On)
+            # 1 4 6 7 
 
         if any(self.activated_branches[1:-1]):
+            x = mask_down(x, Mask_Pass_On)
+            
             x = self.layer2(x)
             x = self.layer3(x)
             
             if self.activated_branches[1]:
+
                 y_exitTwo = self.earlyExit2(x)
                 y_exitTwo = mask_up(y_exitTwo, Mask_Pass_On)
+                x = mask_up(x, Mask_Pass_On)
+                
+                # 1 - - 4 - 6 7
 
-                Mask_exitTwo = max(y_exitTwo, axis=1)[0] >= 0.75
+                Mask_exitTwo = max(y_exitTwo, axis=1)[0] >= 0.15
                 Mask_exitTwo = Mask_exitTwo.reshape(-1, 1)
                 
                 # If there are further exits we have to sort the bad results out
                 if (self.activated_branches[-1]):
                     y_exitTwo = (y_exitTwo * Mask_exitTwo)
+                    x = mask_up(x, Mask_exitTwo)
                     if cuda.is_available():
                         y_exitTwo = y_exitTwo.to(device='cuda')
                     # print(y.get_device(), y_exitTwo.get_device())
                 y += y_exitTwo    
                 
-                Mask_Pass_On = logical_and(logical_not(Mask_exitTwo), Mask_Pass_On.reshape(-1, 1)).reshape(-1)
+                Mask_Pass_On = logical_not(Mask_exitTwo).reshape(-1)
+
+                x = mask_down(x, Mask_Pass_On)
                 # Mask_Pass_On -= mask_up(Mask_exitTwo, Mask_Pass_On).reshape(-1)
 
             if self.activated_branches[-1]:
-                x = mask_down(x, Mask_Pass_On)
                 x = self.layer4(x)
                 
                 y_full_path = mask_up(x, Mask_Pass_On)
@@ -537,13 +550,14 @@ class BranchyNet(nn.Module):
 #         y = self.earlyExit2(x)
 
 def mask_down(t: Tensor, mask: Tensor) -> Tensor:
+    mask = mask.reshape(-1)
+
     if cuda.is_available(): 
         return t[mask.bool()].to(device='cuda')
 
     return t[mask.bool()]
 
 def mask_up(t: Tensor, mask: Tensor) -> Tensor:
-
     '''This method takes a downsized vector and upsizes it again, so that the new tensor
         has its values where the mask has its Ones.'''
 
