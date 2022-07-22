@@ -30,7 +30,6 @@ class BranchyNetLoss(nn.Module):
         loss = 0.0
         if isinstance(pred, list):
             for exit in pred:
-                print(loss)
                 loss += branchy_net_loss(exit, target)
             return loss
         
