@@ -259,8 +259,6 @@ class BranchyNet(nn.Module):
     
     def forward_test(self, x: Tensor)-> Tensor:
 
-        pdb.set_trace()
-
         bs = x.size()[0]
         y = zeros(bs, 10)
         Mask_Pass_On = ones(bs).bool()
