@@ -259,8 +259,6 @@ class BranchyNet(nn.Module):
     
     def forward_test(self, x: Tensor)-> Tensor:
 
-        pdb.set_trace()
-
         bs = x.size()[0]
         y = zeros(bs, 10)
         Mask_Pass_On = ones(bs).bool()
@@ -276,7 +274,7 @@ class BranchyNet(nn.Module):
         if self.activated_branches[0]:
             y_exitOne = self.earlyExit1(x)
             
-            Mask_exitOne = max(y_exitOne, axis=1)[0] >= 0.15
+            Mask_exitOne = max(y_exitOne, axis=1)[0] >= 0.65
             Mask_exitOne = Mask_exitOne.reshape(-1, 1)
             
             # If there are further exits we have to sort the bad results out
@@ -304,7 +302,7 @@ class BranchyNet(nn.Module):
                 
                 # 1 - - 4 - 6 7
 
-                Mask_exitTwo = max(y_exitTwo, axis=1)[0] >= 0.15
+                Mask_exitTwo = max(y_exitTwo, axis=1)[0] >= 0.65
                 Mask_exitTwo = Mask_exitTwo.reshape(-1, 1)
                 
                 # If there are further exits we have to sort the bad results out
