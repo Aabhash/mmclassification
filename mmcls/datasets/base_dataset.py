@@ -5,6 +5,7 @@ from abc import ABCMeta, abstractmethod
 from os import PathLike
 from typing import List
 
+import pdb
 import mmcv
 import numpy as np
 from torch.utils.data import Dataset
@@ -154,7 +155,9 @@ class BaseDataset(Dataset, metaclass=ABCMeta):
         allowed_metrics = [
             'accuracy', 'precision', 'recall', 'f1_score', 'support'
         ]
+        # pdb.set_trace()
         eval_results = {}
+        results = [r.cpu() for r in results]
         results = np.vstack(results)
         gt_labels = self.get_gt_labels()
         if indices is not None:
