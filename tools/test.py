@@ -3,7 +3,8 @@ import argparse
 import os
 import warnings
 from numbers import Number
-
+from fvcore.nn import FlopCountAnalysis
+from mmcv.cnn.utils import get_model_complexity_info
 import mmcv
 import numpy as np
 import torch
@@ -168,7 +169,7 @@ def main():
 
     # build the model and load checkpoint
     model = build_classifier(cfg.model)
-    model_object = model
+    model_object = model.eval()
     fp16_cfg = cfg.get('fp16', None)
     if fp16_cfg is not None:
         wrap_fp16_model(model)
@@ -182,6 +183,16 @@ def main():
         warnings.warn('Class names are not saved in the checkpoint\'s '
                       'meta data, use imagenet by default.')
         CLASSES = ImageNet.CLASSES
+    totall_flops = []
+    #for i, data in enumerate(data_loader):
+    #    with torch.no_grad():
+                            
+    #        flops = FlopCountAnalysis(model.cuda(), (data["img"].cuda(), False))
+            #flops_2, params = get_model_complexity_info(model, img)
+    #        totall_flops.append(flops.total())
+    #    avg_flops = sum(totall_flops)/len(totall_flops)
+    #    print(avg_flops)
+            
     start_time = time.time()
     if not distributed:
         if args.device == 'cpu':
@@ -213,7 +224,7 @@ def main():
                                  args.gpu_collect)
 
     rank, _ = get_dist_info()
-    if True:
+    if False:
         masks = model_object.special_metrics
     if rank == 0:
         results = {}
@@ -249,7 +260,10 @@ def main():
                     'avg_time_batch': (time.time() - start_time) / (len(scores)/test_loader_cfg['samples_per_gpu'])
                 }
                 if True:  # TODO define args to deside
-                    pass
+                    
+                    print("test")
+                    
+                    
                 if 'all' in args.out_items:
                     results.update(res_items)
                 else:
