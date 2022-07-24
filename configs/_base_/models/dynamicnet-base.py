@@ -6,8 +6,7 @@ model = dict(
         growth_rate = 4,
         reduction_rate = 0.5,
         compress_factor = 0.25,
-        depths = [6, 12, 24, 16],
-        channels = 8,
+        channels = 16,
         n_scales = 3,
         n_blocks = 2,
         block_step = 2,
@@ -22,6 +21,7 @@ model = dict(
         # num_classes=10,
         # in_channels=1280,
         loss=dict(type='CrossEntropyLoss', loss_weight=1.0),
-        topk=(1, 5)
-    )
+        topk=(1, )
+    ),
+    pretrained=None
 )
