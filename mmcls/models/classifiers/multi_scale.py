@@ -1,6 +1,7 @@
 from ..builder import CLASSIFIERS, build_backbone, build_head, build_neck
 from ..utils.augment import Augments
 from .base import BaseClassifier
+import torch
 
 
 @CLASSIFIERS.register_module()

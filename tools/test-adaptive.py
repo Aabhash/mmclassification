@@ -210,7 +210,7 @@ def main():
             broadcast_buffers=False)
         outputs = multi_gpu_test(model, data_loader, args.tmpdir,
                                  args.gpu_collect)
-    print(time.time()-start_time)
+
     rank, _ = get_dist_info()
     if rank == 0:
         results = {}

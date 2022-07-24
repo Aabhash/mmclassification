@@ -71,9 +71,11 @@ class MultiScaleHead(BaseHead):
         pred = []
 
         # exit_tracker = {nlabel:[] for nlabel in range(10)}
+        
         for i, out in enumerate(x):
             logits = self.softmax(out)
             pred.append(logits)
+
             # max_preds, max_idx = torch.max(logits, dim=1)
             # exits = max_preds.ge(self.T[i])
             # # for j, pred_gt in enumerate(exits):
@@ -82,14 +84,19 @@ class MultiScaleHead(BaseHead):
             # #         max_preds
                     
                     
-            # breakpoint()
-            # for j in range()
-
+        # pred = self.softmax(x[0])
         if post_process:
             return self.post_process(pred)
         else:
             return pred[-1]
 
+    def post_process_single(self, pred):
+        on_trace = is_tracing()
+        if torch.onnx.is_in_onnx_export() or on_trace:
+            return pred
+        pred = list(pred.detach().cpu().numpy())
+        return pred
+        
     def post_process(self, pred):
         on_trace = is_tracing()
         if torch.onnx.is_in_onnx_export() or on_trace:
