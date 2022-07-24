@@ -420,9 +420,10 @@ class BranchyNetImagenette(nn.Module):
 
         self.layer4 = nn.Sequential(
             self.model.layer4,
-            nn.AvgPool2d(3, stride=2, padding=1),
+            nn.AvgPool2d(5, stride=3, padding=0),
             nn.Flatten(),
             nn.Linear(8192, 2048),
+            nn.ReLU(),
             self.model.fc,
             nn.Softmax(dim=1)
         )
