@@ -376,43 +376,37 @@ class BranchyNetImagenette(nn.Module):
             nn.Conv2d(256, 512, 5, 3),
             nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
             nn.ReLU(),
-            nn.Conv2d(512, 1024, 5, 2),
-            nn.BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
-            nn.ReLU(),
-            nn.Conv2d(1024, 2048, 5, 3),
-            nn.BatchNorm2d(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+            nn.Conv2d(512, 512, 5, 3),
+            nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
             nn.ReLU(),
             nn.AvgPool2d(5, stride=3, padding=0),
-            nn.Conv2d(2048, 4096, 3, 3),
-            nn.BatchNorm2d(4096, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+            nn.Conv2d(512, 512, 3, 2),
+            nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
             nn.ReLU(),
-            nn.AvgPool2d(3, stride=3, padding=0),
+            nn.AvgPool2d(3, stride=2, padding=1),
             nn.Flatten(),
-            nn.Linear(4096, 2048),
-            nn.ReLU(),
             nn.Linear(2048, 10),
+            nn.ReLU(),
             nn.Softmax(dim=1),
         )
 
-        self.layer2 = self.model.layer2
+        self.layer2 = nn.Sequential(
+                nn.Conv2d(256, 256, 5, 3),
+                nn.BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU(),
+                self.model.layer2,
+            )
 
         self.earlyExit2 = nn.Sequential(
-            nn.Conv2d(512, 512, 7, 3),
+            nn.Conv2d(512, 512, 3, 3),
             nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
-            nn.ReLU(),
-            nn.Conv2d(512, 1024, 5, 3),
-            nn.BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
             nn.ReLU(), 
-            nn.Conv2d(1024, 2048, 5, 3),
-            nn.BatchNorm2d(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+            nn.Conv2d(512, 1024, 3, 2),
+            nn.BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
             nn.ReLU(),
-            nn.Conv2d(2048, 4096, 3, 2, padding=1),
-            nn.BatchNorm2d(4096, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
-            nn.ReLU(),
-            nn.AvgPool2d(3, stride=3, padding=0),
+            nn.AvgPool2d(3, stride=2, padding=0),
             nn.Flatten(),
-            nn.Linear(8192, 2048),
-            nn.Linear(2048, 10),
+            nn.Linear(4096, 1024),
             nn.Softmax(dim=1),
         )
 
@@ -420,10 +414,7 @@ class BranchyNetImagenette(nn.Module):
 
         self.layer4 = nn.Sequential(
             self.model.layer4,
-            nn.Conv2d(2048, 1024, 7, 5, padding=1),
-            nn.BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
-            nn.ReLU(),
-            nn.Conv2d(1024, 1024, 5, 3, padding=0),
+            nn.Conv2d(2048, 1024, 3, 2, padding=0),
             nn.BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
             nn.ReLU(),
             nn.AvgPool2d(2, stride=2, padding=0),
@@ -488,8 +479,7 @@ class BranchyNetImagenette(nn.Module):
             # 1 4 6 7 
 
         if any(self.activated_branches[1:]):
-            x = mask_down(x, Mask_Pass_On)
-            
+            x = mask_down(x, Mask_Pass_On)       
             x = self.layer2(x)
             
             if self.activated_branches[1]:
