@@ -32,7 +32,7 @@ test_pipeline = [
     dict(type='Collect', keys=['img'])
 ]
 data = dict(
-    samples_per_gpu=32,
+    samples_per_gpu=16,
     workers_per_gpu=1,
     train=dict(
         type=dataset_type,
@@ -44,7 +44,7 @@ data = dict(
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
-        data_prefix='data/cifar10',
+        data_prefix='data/imagenette2/val',
         pipeline=test_pipeline,
         test_mode=True),
 )
@@ -75,6 +75,6 @@ dist_params = dict(backend='nccl')   # Parameters to setup distributed training,
 log_level = 'INFO'             # The output level of the log.
 resume_from = None             # Resume checkpoints from a given path, the training will be resumed from the epoch when the checkpoint's is saved.
 workflow = [('train', 1)]      # Workflow for runner. [('train', 1)] means there is only one workflow and the workflow named 'train' is executed once.
-work_dir = 'work_dir'          # Directory to save the model checkpoints and logs for the current experiments
+work_dir = 'work_dirs/BranchyNet-ImageNette'          # Directory to save the model checkpoints and logs for the current experiments
 
 load_from = False

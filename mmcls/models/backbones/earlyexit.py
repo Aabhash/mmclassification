@@ -349,7 +349,7 @@ class BranchyNetImagenette(nn.Module):
         self.pretrained = pretrained
 
         self.model = ResNet_CIFAR(depth=50)
-        self.model.fc = nn.Linear(2048, 10, bias=True)
+        # self.model.fc = nn.Linear(2048, 10, bias=True)
 
         # Load Pretrained Resnet 
         if self.pretrained:
@@ -369,33 +369,28 @@ class BranchyNetImagenette(nn.Module):
             self.model.conv1,
             self.model.bn1,
             self.model.relu,
-            self.model.layer1
+            self.model.layer1,
+            nn.Conv2d(256, 256, 5, 3),
+            nn.BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+            nn.ReLU(),
+
         )
 
         self.earlyExit1 = nn.Sequential(
             nn.Conv2d(256, 512, 5, 3),
             nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
             nn.ReLU(),
-            nn.Conv2d(512, 512, 5, 3),
-            nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
-            nn.ReLU(),
             nn.AvgPool2d(5, stride=3, padding=0),
-            nn.Conv2d(512, 512, 3, 2),
-            nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+            nn.Conv2d(512, 1024, 3, 2),
+            nn.BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
             nn.ReLU(),
             nn.AvgPool2d(3, stride=2, padding=1),
             nn.Flatten(),
-            nn.Linear(2048, 10),
-            nn.ReLU(),
+            nn.Linear(4096, 10),
             nn.Softmax(dim=1),
         )
 
-        self.layer2 = nn.Sequential(
-                nn.Conv2d(256, 256, 5, 3),
-                nn.BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
-                nn.ReLU(),
-                self.model.layer2,
-            )
+        self.layer2 = self.model.layer2
 
         self.earlyExit2 = nn.Sequential(
             nn.Conv2d(512, 512, 3, 3),
@@ -406,7 +401,7 @@ class BranchyNetImagenette(nn.Module):
             nn.ReLU(),
             nn.AvgPool2d(3, stride=2, padding=0),
             nn.Flatten(),
-            nn.Linear(4096, 1024),
+            nn.Linear(4096, 10),
             nn.Softmax(dim=1),
         )
 
@@ -419,9 +414,7 @@ class BranchyNetImagenette(nn.Module):
             nn.ReLU(),
             nn.AvgPool2d(2, stride=2, padding=0),
             nn.Flatten(),
-            nn.Linear(4096, 2048),
-            nn.ReLU(),
-            self.model.fc,
+            nn.Linear(4096, 10),
             nn.Softmax(dim=1)
         )
 
@@ -481,7 +474,6 @@ class BranchyNetImagenette(nn.Module):
         if any(self.activated_branches[1:]):
             x = mask_down(x, Mask_Pass_On)       
             x = self.layer2(x)
-            
             if self.activated_branches[1]:
 
                 y_exitTwo = self.earlyExit2(x)
