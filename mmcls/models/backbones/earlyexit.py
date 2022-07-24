@@ -288,7 +288,7 @@ class BranchyNet(nn.Module):
 
             # 1 4 6 7 
 
-        if any(self.activated_branches[1:-1]):
+        if any(self.activated_branches[1:]):
             x = mask_down(x, Mask_Pass_On)
             
             x = self.layer2(x)
@@ -308,7 +308,7 @@ class BranchyNet(nn.Module):
                 # If there are further exits we have to sort the bad results out
                 if (self.activated_branches[-1]):
                     y_exitTwo = (y_exitTwo * Mask_exitTwo)
-                    x = mask_up(x, Mask_exitTwo)
+                    # x = mask_up(x, Mask_exitTwo)
                     if cuda.is_available():
                         y_exitTwo = y_exitTwo.to(device='cuda')
                     # print(y.get_device(), y_exitTwo.get_device())

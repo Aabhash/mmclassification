@@ -1,7 +1,7 @@
 " This Configuration File represents a 1-1-0-BranchyNet, i.e. a BranchyNet with first and the second exit activated."
 
 model = dict(
-    type='ImageClassifier',
+    type='EarlyExitClassifier',
     backbone=dict(
         type='BranchyNet',
         activated_branches=[True, True, False]),

@@ -1,7 +1,7 @@
 " This Configuration File represents a ResNet-50, i.e. a BranchyNet with only the final exit activated."
 
 model = dict(
-    type='ImageClassifier',
+    type='EarlyExitClassifier',
     backbone=dict(
         type='BranchyNet',
         activated_branches=[False, False, True]),
