@@ -1,20 +1,30 @@
-from mmcls.models.backbones.earlyexit import BranchyNet
+from mmcls.models.backbones.earlyexit import BranchyNetImagenette
 import pdb
 from torch import rand, max
+from torchvision import transforms
 
-m100 = BranchyNet([1, 0, 0])
-m110 = BranchyNet([1, 1, 0])
-m101 = BranchyNet([1, 0, 1])
-m111 = BranchyNet([1, 1, 1])
-m010 = BranchyNet([0, 1, 0])
-m001 = BranchyNet([0, 0, 1])
-m011 = BranchyNet([0, 1, 1])
+from PIL import Image
+
+
+m100 = BranchyNetImagenette([1, 0, 0])
+m110 = BranchyNetImagenette([1, 1, 0])
+m101 = BranchyNetImagenette([1, 0, 1])
+m111 = BranchyNetImagenette([1, 1, 1])
+m010 = BranchyNetImagenette([0, 1, 0])
+m001 = BranchyNetImagenette([0, 0, 1])
+m011 = BranchyNetImagenette([0, 1, 1])
 
 models = [(m100, "m100"), (m110, "m110"), (m101, "m101"), 
           (m111, "m111"), (m010, "m010"), (m001, "m001"), 
            (m011, "m011")]
 
-t = 7 * rand(8, 3, 32, 32)
+# t = 7 * rand(8, 3, 64, 64)
+
+img = Image.open("/home/graf-wronski/Downloads/n01440764_11400.JPEG")
+convert_tensor = transforms.ToTensor()
+t = convert_tensor(img)[None, :] # we need to add a dummy dimension as batch size 
+
+# pdb.set_trace()
 
 for pair in models:
     m = pair[0]
@@ -25,3 +35,6 @@ for pair in models:
     print(f"Length of: forward_train(t):{len(m.forward_train(t))} \n")
     print(f"Shape of: forward_test(t): {m.forward_test(t).shape} \n")
     print(f"forward_test(t) \n {m.forward_test(t)}")
+
+
+

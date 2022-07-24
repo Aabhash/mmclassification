@@ -8,7 +8,7 @@ model = dict(
         loss=dict(type='BranchyNetLoss'), # Loss function configuration information
         topk=(1, 5),              # Evaluation index, Top-k accuracy rate, here is the accuracy rate of top1 and top5
     )
-        
+    
 )
 # dataset settings
 dataset_type = 'CIFAR10'
