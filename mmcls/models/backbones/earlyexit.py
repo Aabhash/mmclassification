@@ -420,6 +420,9 @@ class BranchyNetImagenette(nn.Module):
 
         self.layer4 = nn.Sequential(
             self.model.layer4,
+            nn.Conv2d(2048, 4096, 7, 5, padding=1),
+            nn.BatchNorm2d(4096, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+            nn.ReLU(),
             nn.AvgPool2d(5, stride=3, padding=0),
             nn.Flatten(),
             nn.Linear(8192, 2048),
