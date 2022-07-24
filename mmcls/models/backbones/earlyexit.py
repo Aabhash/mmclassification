@@ -440,8 +440,8 @@ class BranchyNetImagenette(nn.Module):
         x = self.layer1(x)
         y1 = self.earlyExit1(x)
         x = self.layer2(x)
-        x = self.layer3(x)
         y2 = self.earlyExit2(x)
+        x = self.layer3(x)
         y3 = self.layer4(x)
 
         return [y1, y2, y3]
