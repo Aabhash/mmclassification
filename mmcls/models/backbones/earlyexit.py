@@ -388,7 +388,8 @@ class BranchyNetImagenette(nn.Module):
             nn.ReLU(),
             nn.AvgPool2d(3, stride=3, padding=0),
             nn.Flatten(),
-            nn.Linear(8192, 2048),
+            nn.Linear(4096, 2048),
+            nn.ReLu(),
             nn.Linear(2048, 10),
             nn.Softmax(dim=1),
         )
