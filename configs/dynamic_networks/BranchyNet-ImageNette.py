@@ -41,7 +41,12 @@ data = dict(
     val=dict(
         type=dataset_type,
         data_prefix='data/imagenette2/val',
-        pipeline=test_pipeline)
+        pipeline=test_pipeline),
+    test=dict(
+        type=dataset_type,
+        data_prefix='data/cifar10',
+        pipeline=test_pipeline,
+        test_mode=True),
 )
 # he configuration file used to build the optimizer, support all optimizers in PyTorch.
 optimizer = dict(type='SGD',         # Optimizer type
