@@ -395,18 +395,27 @@ class BranchyNetImagenette(nn.Module):
 
         self.layer2 = self.model.layer2
 
-        self.layer3 = self.model.layer3
-
         self.earlyExit2 = nn.Sequential(
-            nn.Conv2d(1024, 2048, 3, 2),
-            nn.BatchNorm2d(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+            nn.Conv2d(512, 1024, 7, 3),
+            nn.BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
             nn.ReLU(),
-            nn.AvgPool2d(3, stride=2, padding=1),
+            nn.Conv2d(1024, 2048, 5, 3),
+            nn.BatchNorm2d(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+            nn.ReLU(), 
+            nn.Conv2d(2048, 4096, 5, 3),
+            nn.BatchNorm2d(4096, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+            nn.ReLU(),
+            nn.Conv2d(4096, 4096, 3, 2, padding=1),
+            nn.BatchNorm2d(4096, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+            nn.ReLU(),
+            nn.AvgPool2d(3, stride=3, padding=0),
             nn.Flatten(),
             nn.Linear(8192, 2048),
-            self.model.fc,
-            nn.Softmax(dim=1)
+            nn.Linear(2048, 10),
+            nn.Softmax(dim=1),
         )
+
+        self.layer3 = self.model.layer3
 
         self.layer4 = nn.Sequential(
             self.model.layer4,
@@ -474,7 +483,6 @@ class BranchyNetImagenette(nn.Module):
             x = mask_down(x, Mask_Pass_On)
             
             x = self.layer2(x)
-            x = self.layer3(x)
             
             if self.activated_branches[1]:
 
@@ -502,6 +510,7 @@ class BranchyNetImagenette(nn.Module):
                 # Mask_Pass_On -= mask_up(Mask_exitTwo, Mask_Pass_On).reshape(-1)
 
             if self.activated_branches[-1]:
+                x = self.layer3(x)
                 x = self.layer4(x)
                 
                 y_full_path = mask_up(x, Mask_Pass_On)
