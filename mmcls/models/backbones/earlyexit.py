@@ -379,13 +379,18 @@ class BranchyNetImagenette(nn.Module):
             nn.Conv2d(512, 1024, 5, 2),
             nn.BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
             nn.ReLU(),
-            nn.Conv2d(1024, 2048, 3, 2),
+            nn.Conv2d(1024, 2048, 5, 3),
             nn.BatchNorm2d(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
             nn.ReLU(),
-            nn.AvgPool2d(3, stride=2, padding=1),
+            nn.AvgPool2d(5, stride=3, padding=0),
+            nn.Conv2d(2048, 4096, 3, 3),
+            nn.BatchNorm2d(4096, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+            nn.ReLU(),
+            nn.AvgPool2d(3, stride=3, padding=0),
             nn.Flatten(),
-            self.model.fc,
-            nn.Softmax(dim=1)
+            nn.Linear(8192, 2048),
+            nn.Linear(2048, 10),
+            nn.Softmax(dim=1),
         )
 
         self.layer2 = self.model.layer2
