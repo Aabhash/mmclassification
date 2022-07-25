@@ -59,7 +59,7 @@ optimizer_config = dict(grad_clip=None)  # Most of the methods do not use gradie
 lr_config = dict(policy='step',          # The policy of scheduler, also support CosineAnnealing, Cyclic, etc. Refer to details of supported LrUpdater from https://github.com/open-mmlab/mmcv/blob/master/mmcv/runner/hooks/lr_updater.py#L9.
                  step=[10, 20, 30])      # Steps to decay the learning rate
 runner = dict(type='EpochBasedRunner',   # Type of runner to use (i.e. IterBasedRunner or EpochBasedRunner)
-            max_epochs=15)    # Runner that runs the workflow in total max_epochs. For IterBasedRunner use `max_iters`
+            max_epochs=100)    # Runner that runs the workflow in total max_epochs. For IterBasedRunner use `max_iters`
 
 # Config to set the checkpoint hook, Refer to https://github.com/open-mmlab/mmcv/blob/master/mmcv/runner/hooks/checkpoint.py for implementation.
 checkpoint_config = dict(interval=1)    # The save interval is 1

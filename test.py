@@ -20,7 +20,7 @@ models = [(m100, "m100"), (m110, "m110"), (m101, "m101"),
 
 # t = 7 * rand(8, 3, 64, 64)
 
-img = Image.open("/home/graf-wronski/Downloads/n01440764_11400.JPEG")
+img = Image.open("/home/carlwanninger/till/mmclassification/data/imagenette2/val/n01440764/n01440764_11400.JPEG")
 convert_tensor = transforms.ToTensor()
 t = convert_tensor(img)[None, :] # we need to add a dummy dimension as batch size 
 
