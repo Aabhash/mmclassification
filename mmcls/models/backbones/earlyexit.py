@@ -456,25 +456,21 @@ class BranchyNetImagenette2(nn.Module):
             nn.Conv2d(256, 256, 5, 3),
             nn.BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
             nn.ReLU(),
-
         )
 
         self.earlyExit1 = nn.Sequential(
             nn.Conv2d(256, 256, 5, 4),
             nn.BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
             nn.ReLU(),
-            nn.Conv2d(256, 256, 5, 3),
-            nn.BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
-            nn.ReLU(),
             nn.Conv2d(256, 256, 3, 2),
             nn.BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
             nn.ReLU(),
             nn.Conv2d(256, 256, 3, 2),
             nn.BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
             nn.ReLU(),
-            nn.AvgPool2d(3, stride=1, padding=1),
+            nn.AvgPool2d(3, stride=2, padding=1),
             nn.Flatten(),
-            nn.Linear(3072, 10),
+            nn.Linear(3840, 10),
             nn.Softmax(dim=1),
         )
 
@@ -490,9 +486,9 @@ class BranchyNetImagenette2(nn.Module):
             nn.Conv2d(512, 512, 3, 2),
             nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
             nn.ReLU(),
-            nn.AvgPool2d(3, stride=1, padding=1),
+            nn.AvgPool2d(2, stride=1, padding=1),
             nn.Flatten(),
-            nn.Linear(6144, 10),
+            nn.Linear(4608, 10),
             nn.Softmax(dim=1),
         )
 
@@ -500,12 +496,15 @@ class BranchyNetImagenette2(nn.Module):
 
         self.layer4 = nn.Sequential(
             self.model.layer4,
-            nn.Conv2d(2048, 512, 3, 2, padding=0),
+            nn.Conv2d(2048, 512, 5, 2, padding=0),
             nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+            nn.ReLU(),
+            nn.Conv2d(512, 256, 3, 1, padding=0),
+            nn.BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
             nn.ReLU(),
             nn.AvgPool2d(2, stride=1, padding=0),
             nn.Flatten(),
-            nn.Linear(4096, 10),
+            nn.Linear(4608, 10),
             nn.Softmax(dim=1)
         )
 
