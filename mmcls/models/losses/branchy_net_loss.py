@@ -39,10 +39,11 @@ class BranchyNetLoss(nn.Module):
         loss = branchy_net_loss(pred, target)
         return loss
 
+@LOSSES.register_module()
 class WeightedBranchyNetLoss(nn.Module):
     "A Branchy Net Loss with weights for different exits"
     def __init__(self, weights: List):
-        super(BranchyNetLoss).__init__()
+        super(WeightedBranchyNetLoss, self).__init__()
         self.weights = weights
 
     def forward(self, pred: Union[Tensor, List[Tensor]], target: Tensor, avg_factor=None,) -> float:
