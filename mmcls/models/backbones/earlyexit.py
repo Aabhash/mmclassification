@@ -373,33 +373,33 @@ class BranchyNetImagenette(nn.Module):
         return y
 
 
-def mask_down(t: Tensor, mask: Tensor) -> Tensor:
-    mask = mask.reshape(-1)
+# def mask_down(t: Tensor, mask: Tensor) -> Tensor:
+#     mask = mask.reshape(-1)
 
-    if cuda.is_available(): 
-        return t[mask.bool()].to(device='cuda')
+#     if cuda.is_available(): 
+#         return t[mask.bool()].to(device='cuda')
 
-    return t[mask.bool()]
+#     return t[mask.bool()]
 
-def mask_up(t: Tensor, mask: Tensor) -> Tensor:
-    '''This method takes a downsized vector and upsizes it again, so that the new tensor
-        has its values where the mask has its Ones.'''
+# def mask_up(t: Tensor, mask: Tensor) -> Tensor:
+#     '''This method takes a downsized vector and upsizes it again, so that the new tensor
+#         has its values where the mask has its Ones.'''
 
-    mask_as_list = list(mask)
-    BS =  len(mask_as_list)
-    # BS, C, H, W = len(mask_as_list), *(list(t.size())[1: ])
-    small_batch_size = t.size()[0]
-    # output = zeros(BS, C, H, W)
-    output = zeros(BS, *(list(t.size())[1: ]))
+#     mask_as_list = list(mask)
+#     BS =  len(mask_as_list)
+#     # BS, C, H, W = len(mask_as_list), *(list(t.size())[1: ])
+#     small_batch_size = t.size()[0]
+#     # output = zeros(BS, C, H, W)
+#     output = zeros(BS, *(list(t.size())[1: ]))
 
-    i = 0
-    for j in range(BS):
-        if mask_as_list[j]:
-            output[j, :] = t[i, :]
-            i += 1
-    if cuda.is_available():
-        return output.to(device='cuda')
-    return output
+#     i = 0
+#     for j in range(BS):
+#         if mask_as_list[j]:
+#             output[j, :] = t[i, :]
+#             i += 1
+#     if cuda.is_available():
+#         return output.to(device='cuda')
+#     return output
 
 @BACKBONES.register_module()
 class BranchyNetImagenette2(nn.Module):
@@ -426,10 +426,16 @@ class BranchyNetImagenette2(nn.Module):
         assert(any(activated_branches))
         self.activated_branches = activated_branches.copy()
         self.pretrained = pretrained
+        
         if self.activated_branches[0] == True:
             self.th_One = exit_treshholds.pop(0)
         if self.activated_branches[1] == True:
             self.th_Two = exit_treshholds.pop(0)
+
+        if cuda.is_available():
+            self.device = 'cuda'
+        else:
+            self.device = 'cpu'            
 
         self.model = ResNet_CIFAR(depth=50)
         # self.model.fc = nn.Linear(2048, 10, bias=True)
@@ -509,8 +515,8 @@ class BranchyNetImagenette2(nn.Module):
         )
 
     def forward(self, img, return_loss):
-        if cuda.is_available():
-            img = img.to(device='cuda')
+        
+        img = img.to(self.device)
 
         if return_loss:
             return self.forward_train(img)
@@ -604,7 +610,7 @@ def mask_down(self, t: Tensor, mask: Tensor) -> Tensor:
     
     mask = mask.reshape(-1)
 
-    return t[mask.bool()]
+    return t[mask.bool()].to(self.device)
 
 def mask_up(self, t: Tensor, mask: Tensor) -> Tensor:
     '''This method takes a downsized vector and upsizes it again, so that the new tensor
@@ -616,6 +622,6 @@ def mask_up(self, t: Tensor, mask: Tensor) -> Tensor:
 
     output[mask] = t
 
-    return output    
+    return output.to(self.device)
     
 
