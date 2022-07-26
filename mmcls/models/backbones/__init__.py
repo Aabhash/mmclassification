@@ -35,6 +35,7 @@ from .van import VAN
 from .vgg import VGG
 from .vision_transformer import VisionTransformer
 from .earlyexit import BranchyNet, BranchyNetImagenette
+from .grgbnet import GRGBnet_Base
 
 
 __all__ = [
@@ -45,5 +46,6 @@ __all__ = [
     'Conformer', 'MlpMixer', 'DistilledVisionTransformer', 'PCPVT', 'SVT',
     'EfficientNet', 'ConvNeXt', 'HRNet', 'ResNetV1c', 'ConvMixer',
     'CSPDarkNet', 'CSPResNet', 'CSPResNeXt', 'CSPNet', 'RepMLPNet',
-    'PoolFormer', 'DenseNet', 'VAN', 'BranchyNet', 'BranchyNetImagenette'
+    'PoolFormer', 'DenseNet', 'VAN', 'BranchyNet', 'BranchyNetImagenette',
+    'GRGBnet_Base'
 ]
