@@ -437,7 +437,7 @@ class BranchyNetImagenette2(nn.Module):
         else:
             self.device = 'cpu'            
 
-        self.model = ResNet_CIFAR(depth=50)
+        self.model = ResNet_CIFAR(depth=50).to(self.device)
         # self.model.fc = nn.Linear(2048, 10, bias=True)
 
         # Load Pretrained Resnet 
@@ -462,7 +462,7 @@ class BranchyNetImagenette2(nn.Module):
             nn.Conv2d(256, 256, 5, 3),
             nn.BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
             nn.ReLU(),
-        )
+        ).to(self.device)
 
         self.earlyExit1 = nn.Sequential(
             nn.Conv2d(256, 256, 5, 4),
@@ -478,9 +478,9 @@ class BranchyNetImagenette2(nn.Module):
             nn.Flatten(),
             nn.Linear(3840, 10),
             nn.Softmax(dim=1),
-        )
+        ).to(self.device)
 
-        self.layer2 = self.model.layer2
+        self.layer2 = self.model.layer2.to(self.device)
 
         self.earlyExit2 = nn.Sequential(
             nn.Conv2d(512, 512, 5, 4),
@@ -496,9 +496,9 @@ class BranchyNetImagenette2(nn.Module):
             nn.Flatten(),
             nn.Linear(4608, 10),
             nn.Softmax(dim=1),
-        )
+        ).to(self.device)
 
-        self.layer3 = self.model.layer3
+        self.layer3 = self.model.layer3.to(self.device)
 
         self.layer4 = nn.Sequential(
             self.model.layer4,
@@ -512,7 +512,7 @@ class BranchyNetImagenette2(nn.Module):
             nn.Flatten(),
             nn.Linear(4608, 10),
             nn.Softmax(dim=1)
-        )
+        ).to(self.device)
 
     def forward(self, img, return_loss):
         
@@ -524,6 +524,7 @@ class BranchyNetImagenette2(nn.Module):
             return self.forward_test(img)
 
     def forward_train(self, x: Tensor) -> Tensor:
+        x = x.to(self.device)
         x = self.layer1(x)
         y1 = self.earlyExit1(x)
         x = self.layer2(x)
@@ -537,14 +538,11 @@ class BranchyNetImagenette2(nn.Module):
         return forward_test(self, x)
     
     def forward_test(self, x: Tensor)-> Tensor:
-
+        x = x.to(self.device)
         bs = x.size()[0]
-        y = zeros(bs, 10)
+        y = zeros(bs, 10).to(self.device)
         Mask_Pass_On = ones(bs).bool()
-
-        if cuda.is_available():
-            y = y.to(device='cuda')
-            Mask_Pass_On.to(device='cuda')
+        Mask_Pass_On.to(self.device)
 
         x = self.layer1(x)
 
@@ -560,68 +558,74 @@ class BranchyNetImagenette2(nn.Module):
             if any(self.activated_branches[1:-1]):
                 # pdb.set_trace()
                 y_exitOne = y_exitOne * Mask_exitOne
-            y += y_exitOne    
+            y += y_exitOne.to(self.device)    
 
             # Invert the mask and reshape it
-            Mask_Pass_On = (Mask_exitOne < .5).reshape(-1)
+            Mask_Pass_On = (Mask_exitOne < .5).to(self.device)
 
             # 1 4 6 7 
 
         if any(self.activated_branches[1:]):
-            x = mask_down(x, Mask_Pass_On)       
+            x = mask_down(x, Mask_Pass_On).to(self.device)       
             x = self.layer2(x)
             if self.activated_branches[1]:
 
                 y_exitTwo = self.earlyExit2(x)
-                y_exitTwo = mask_up(y_exitTwo, Mask_Pass_On)
-                x = mask_up(x, Mask_Pass_On)
+                y_exitTwo = mask_up(y_exitTwo, Mask_Pass_On).to(self.device)
+                x = mask_up(x, Mask_Pass_On).to(self.device)
                 
                 # 1 - - 4 - 6 7
 
                 Mask_exitTwo = max(y_exitTwo, axis=1)[0] >= self.th_Two
-                Mask_exitTwo = Mask_exitTwo.reshape(-1, 1)
+                Mask_exitTwo = Mask_exitTwo.to(self.device)
                 
                 # If there are further exits we have to sort the bad results out
                 if (self.activated_branches[-1]):
                     y_exitTwo = (y_exitTwo * Mask_exitTwo)
                     # x = mask_up(x, Mask_exitTwo)
-                    if cuda.is_available():
-                        y_exitTwo = y_exitTwo.to(device='cuda')
+                    y_exitTwo = y_exitTwo.to(self.device)
                     # print(y.get_device(), y_exitTwo.get_device())
                 y += y_exitTwo    
                 
-                Mask_Pass_On = logical_not(Mask_exitTwo).reshape(-1)
+                Mask_Pass_On = logical_not(Mask_exitTwo).to(self.device)
 
-                x = mask_down(x, Mask_Pass_On)
+                x = mask_down(x, Mask_Pass_On).to(self.device)
                 # Mask_Pass_On -= mask_up(Mask_exitTwo, Mask_Pass_On).reshape(-1)
 
             if self.activated_branches[-1]:
                 x = self.layer3(x)
                 x = self.layer4(x)
                 
-                y_full_path = mask_up(x, Mask_Pass_On)
+                y_full_path = mask_up(x, Mask_Pass_On).to(self.device)
                 
                 y += y_full_path
 
         return y
 
 
-def mask_down(self, t: Tensor, mask: Tensor) -> Tensor:
+def mask_down(t: Tensor, mask: Tensor) -> Tensor:
     
     mask = mask.reshape(-1)
+    if cuda.is_available():
+        mask=mask.to('cuda')
 
-    return t[mask.bool()].to(self.device)
+    return t[mask.bool()]
 
-def mask_up(self, t: Tensor, mask: Tensor) -> Tensor:
+def mask_up(t: Tensor, mask: Tensor) -> Tensor:
     '''This method takes a downsized vector and upsizes it again, so that the new tensor
         has its values where the mask has its Ones.'''
     mask = mask.reshape(-1)
+    if cuda.is_available():
+        mask=mask.to('cuda')
+        t=t.to('cuda')
 
     bs = mask.size()[0]
     output = zeros(bs, *(list(t.size())[1: ]))
 
+    if cuda.is_available():
+        output=output.to('cuda')
     output[mask] = t
 
-    return output.to(self.device)
+    return output
     
 
