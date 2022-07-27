@@ -57,6 +57,12 @@ class GRGBnet_Base(nn.Module):
             nn.Linear(4608, 10),
             nn.Softmax(dim = 1))
 
+        self.rgb_head = nn.Sequential(
+            nn.AvgPool2d(3, stride=2, padding=1),
+            nn.Flatten(),
+            nn.Linear(4*4*512, 10),
+            nn.Softmax(dim = 1))
+
 
     def forward(self, img: Tensor, return_loss: Boolean) -> Tensor:
         img = img.to(self.device)
@@ -69,13 +75,13 @@ class GRGBnet_Base(nn.Module):
     def forward_train(self, x: Tensor) -> Tensor:
         """ The standard use case for train is with rgb and grayscale. But 
             other settings are possible."""
+        pdb.set_trace()
         if self.use_rgb:  
-            y1 = self.model_rgb(x)
-
+            y1 = self.model_rgb(x)[0]
+            y1 = self.rgb_head(y1)
             if self.use_grayscale:
                 y2 = self.model_grayscale(self.grayscale(x))[0]
                 y2 = self.grayscale_head(y2)
-                
                 
                 return [y1, y2]
             
@@ -90,44 +96,44 @@ class GRGBnet_Base(nn.Module):
         return forward_test(self, x)
     
     def forward_test(self, x: Tensor)-> Tensor:
-        
         bs = x.size()[0]
         mask_grayscale = ones(bs).to(self.device)
         y = zeros(bs, 10).to(self.device)
 
         if self.use_grayscale:
             x_gray = self.grayscale(x)
-            pdb.set_trace()
             x_gray = self.model_grayscale(x_gray)[0]
             grayscale_output = self.grayscale_head(x_gray)
-            
             
             if not self.use_rgb:
                 return grayscale_output
             else:
                 mask_grayscale = (max(grayscale_output, axis=1)[0] >= 0.80)
-                y += grayscale_output * mask_grayscale
+                y += mask_grayscale.reshape(-1,1) * grayscale_output 
 
         if self.use_rgb:        
-            mask_grayscale <= 0.5
-            x = self.mask_down(x, mask_grayscale)
-            rgb_output = self.mask_up(self.model_rgb(x), mask_grayscale) 
+            mask_grayscale = mask_grayscale <= 0.5
+            x = mask_down(x, mask_grayscale)
+            pdb.set_trace()
+            x = self.model_rgb(x)[0]
+            rgb_output = mask_up(self.rgb_head(x), mask_grayscale) 
 
             y += rgb_output
         
         return y
 
-def mask_down(self, t: Tensor, mask: Tensor) -> Tensor:
-    
+def mask_down(t: Tensor, mask: Tensor) -> Tensor:
+    pdb.set_trace()
     mask = mask.reshape(-1)
 
     return t[mask.bool()]
 
-def mask_up(self, t: Tensor, mask: Tensor) -> Tensor:
+def mask_up(t: Tensor, mask: Tensor) -> Tensor:
     '''This method takes a downsized vector and upsizes it again, so that the new tensor
         has its values where the mask has its Ones.'''
+    pdb.set_trace()
     mask = mask.reshape(-1)
-
+    
     bs = mask.size()[0]
     output = zeros(bs, *(list(t.size())[1: ]))
 
