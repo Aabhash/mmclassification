@@ -231,6 +231,7 @@ def main():
                 print(f'\n{k} : {v}')
         if args.out:
             if 'none' not in args.out_items:
+                outputs = [x.to('cpu') for x in outputs]
                 scores = np.vstack(outputs)
                 pred_score = np.max(scores, axis=1)
                 pred_label = np.argmax(scores, axis=1)
