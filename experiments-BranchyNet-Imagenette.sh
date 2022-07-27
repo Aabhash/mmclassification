@@ -17,56 +17,56 @@ START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/001_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet001.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 010" 
 echo "Configuration: 010" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/010_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet010.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 011"
 echo "Configuration: 011" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/011_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet011.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 100" 
 echo "Configuration: 100" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/100_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet100.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 101" 
 echo "Configuration: 101" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/101_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet101.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 110" 
 echo "Configuration: 110" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/110_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet110.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 111"
 echo "Configuration: 111" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/111_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet110.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 
 echo "--------------------------------------------- /n"
 
@@ -84,56 +84,56 @@ START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/001_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet001.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 010" 
 echo "Configuration: 010" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/010_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet010.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 011"
 echo "Configuration: 011" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/011_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet011.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 100" 
 echo "Configuration: 100" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/100_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet100.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 101" 
 echo "Configuration: 101" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/101_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet101.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 110" 
 echo "Configuration: 110" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/110_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet110.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 111"
 echo "Configuration: 111" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/111_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet110.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 
 echo "--------------------------------------------- /n"
 
@@ -151,56 +151,56 @@ START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/001_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet001.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 010" 
 echo "Configuration: 010" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/010_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet010.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 011"
 echo "Configuration: 011" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/011_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet011.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 100" 
 echo "Configuration: 100" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/100_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet100.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 101" 
 echo "Configuration: 101" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/101_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet101.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 110" 
 echo "Configuration: 110" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/110_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet110.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 111"
 echo "Configuration: 111" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/111_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet110.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 
 echo "--------------------------------------------- /n"
 
@@ -218,56 +218,56 @@ START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/001_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet001.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 010" 
 echo "Configuration: 010" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/010_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet010.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 011"
 echo "Configuration: 011" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/011_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet011.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 100" 
 echo "Configuration: 100" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/100_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet100.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 101" 
 echo "Configuration: 101" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/101_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet101.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 110" 
 echo "Configuration: 110" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/110_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet110.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 111"
 echo "Configuration: 111" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/111_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet110.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 
 echo "--------------------------------------------- /n"
 
@@ -285,54 +285,54 @@ START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/001_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet001.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 010" 
 echo "Configuration: 010" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/010_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet010.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 011"
 echo "Configuration: 011" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/011_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet011.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 100" 
 echo "Configuration: 100" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/100_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet100.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 101" 
 echo "Configuration: 101" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/101_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet101.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 110" 
 echo "Configuration: 110" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/110_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet110.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 echo "Configuration: 111"
 echo "Configuration: 111" >> $LOG_FILE
 START=date+%s
 python3 tools/test.py $CONFIG_FOLDER/111_BranchyNet-Imagenette2.py \
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet110.json >> $LOG_FILE
-echo "Wallclock Time elapsed:" date+%s - $START
-echo "Wallclock Time elapsed:" date+%s - $START >> $LOG_FILE
+echo "Wallclock Time elapsed:" | date +%s - $START
+echo "Wallclock Time elapsed:" | date +%s - $START >> $LOG_FILE
 
