@@ -139,7 +139,10 @@ def main():
         distributed = True
         init_dist(args.launcher, **cfg.dist_params)
 
-    dataset = build_dataset(cfg.data.test, default_args=dict(test_mode=True))
+    try:
+        dataset = build_dataset(cfg.data.test, default_args=dict(test_mode=True))
+    except AttributeError:
+        dataset = build_dataset(cfg.data.val, default_args=dict(test_mode=True))
 
     # build the dataloader
     # The default loader config
