@@ -318,6 +318,7 @@ class BranchyNetImagenette(nn.Module):
         # 1 2 3 4 5 6 7 
 
         if self.activated_branches[0]:
+            pdb.set_trace()
             y_exitOne = self.earlyExit1(x)
             
             Mask_exitOne = max(y_exitOne, axis=1)[0] >= 0.65
@@ -338,7 +339,7 @@ class BranchyNetImagenette(nn.Module):
             x = mask_down(x, Mask_Pass_On)       
             x = self.layer2(x)
             if self.activated_branches[1]:
-
+                pdb.set_trace()
                 y_exitTwo = self.earlyExit2(x)
                 y_exitTwo = mask_up(y_exitTwo, Mask_Pass_On)
                 x = mask_up(x, Mask_Pass_On)
@@ -474,9 +475,9 @@ class BranchyNetImagenette2(nn.Module):
             nn.Conv2d(256, 256, 3, 2),
             nn.BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
             nn.ReLU(),
-            nn.AvgPool2d(3, stride=2, padding=1),
+            nn.AvgPool2d(2, stride=1, padding=1),
             nn.Flatten(),
-            nn.Linear(3840, 10),
+            nn.Linear(4096, 10),
             nn.Softmax(dim=1),
         ).to(self.device)
 
@@ -494,7 +495,7 @@ class BranchyNetImagenette2(nn.Module):
             nn.ReLU(),
             nn.AvgPool2d(2, stride=1, padding=1),
             nn.Flatten(),
-            nn.Linear(4608, 10),
+            nn.Linear(2048, 10),
             nn.Softmax(dim=1),
         ).to(self.device)
 
@@ -505,12 +506,9 @@ class BranchyNetImagenette2(nn.Module):
             nn.Conv2d(2048, 512, 5, 2, padding=0),
             nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
             nn.ReLU(),
-            nn.Conv2d(512, 256, 3, 1, padding=0),
-            nn.BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
-            nn.ReLU(),
             nn.AvgPool2d(2, stride=1, padding=0),
             nn.Flatten(),
-            nn.Linear(4608, 10),
+            nn.Linear(2048, 10),
             nn.Softmax(dim=1)
         ).to(self.device)
 
@@ -581,7 +579,7 @@ class BranchyNetImagenette2(nn.Module):
                 
                 # If there are further exits we have to sort the bad results out
                 if (self.activated_branches[-1]):
-                    y_exitTwo = (y_exitTwo * Mask_exitTwo)
+                    y_exitTwo = (Mask_exitTwo.reshape(-1,1)*y_exitTwo)
                     # x = mask_up(x, Mask_exitTwo)
                     y_exitTwo = y_exitTwo.to(self.device)
                     # print(y.get_device(), y_exitTwo.get_device())

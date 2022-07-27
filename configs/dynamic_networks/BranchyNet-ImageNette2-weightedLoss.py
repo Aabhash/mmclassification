@@ -76,6 +76,6 @@ dist_params = dict(backend='nccl')   # Parameters to setup distributed training,
 log_level = 'INFO'             # The output level of the log.
 resume_from = None             # Resume checkpoints from a given path, the training will be resumed from the epoch when the checkpoint's is saved.
 workflow = [('train', 1)]      # Workflow for runner. [('train', 1)] means there is only one workflow and the workflow named 'train' is executed once.
-work_dir = 'work_dirs/BranchyNet-ImageNette'          # Directory to save the model checkpoints and logs for the current experiments
+work_dir = 'work_dirs/BranchyNet-ImageNette2'          # Directory to save the model checkpoints and logs for the current experiments
 
 load_from = False
