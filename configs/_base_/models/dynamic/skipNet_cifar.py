@@ -6,7 +6,7 @@ model = dict(
     backbone=dict(
         type='ResNetFeedForwardSP_cifar',
         layers=[6,6,6],
-        gate_type= 'ffgate1'
+        gate_type= 'ffgate2'
         ),
 
     head=dict(

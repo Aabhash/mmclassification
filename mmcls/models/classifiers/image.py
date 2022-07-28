@@ -14,9 +14,10 @@ class ImageClassifier(BaseClassifier):
                  head=None,
                  pretrained=None,
                  train_cfg=None,
+                 get_infos=None,
                  init_cfg=None):
         super(ImageClassifier, self).__init__(init_cfg)
-
+        
         if pretrained is not None:
             self.init_cfg = dict(type='Pretrained', checkpoint=pretrained)
         self.backbone = build_backbone(backbone)
@@ -26,14 +27,14 @@ class ImageClassifier(BaseClassifier):
 
         if head is not None:
             self.head = build_head(head)
-
+        self.get_infos = get_infos
         self.augments = None
         if train_cfg is not None:
             augments_cfg = train_cfg.get('augments', None)
             if augments_cfg is not None:
                 self.augments = Augments(augments_cfg)
 
-    def extract_feat(self, img, stage='neck'):
+    def extract_feat(self, img, stage='neck', img_metas=None):
         """Directly extract features from the specified stage.
 
         Args:
@@ -101,7 +102,7 @@ class ImageClassifier(BaseClassifier):
             (f'Invalid output stage "{stage}", please choose from "backbone", '
              '"neck" and "pre_logits"')
 
-        x = self.backbone(img)
+        x = self.backbone(img, img_metas =img_metas, result_file = self.get_infos)
 
         if stage == 'backbone':
             return x
@@ -142,12 +143,12 @@ class ImageClassifier(BaseClassifier):
 
     def simple_test(self, img, img_metas=None, **kwargs):
         """Test without augmentation."""
-        x = self.extract_feat(img)
+        x = self.extract_feat(img, img_metas=img_metas)
 
         if isinstance(self.head, MultiLabelClsHead):
             assert 'softmax' not in kwargs, (
                 'Please use `sigmoid` instead of `softmax` '
                 'in multi-label tasks.')
         res = self.head.simple_test(x, **kwargs)
-      
+
         return res

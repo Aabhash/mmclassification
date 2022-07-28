@@ -167,8 +167,8 @@ class FeedforwardGateII(BaseModule):
         self.avg_layer = nn.AvgPool2d(pool_size)
         self.linear_layer = nn.Conv2d(in_channels=channel, out_channels=2,
                                       kernel_size=1, stride=1)
-        self.prob_layer = nn.Softmax()
-        self.logprob = nn.LogSoftmax()
+        self.prob_layer = nn.Softmax(dim=1)
+        self.logprob = nn.LogSoftmax(dim=1)
 
     def forward(self, x):
         x = self.conv1(x)
@@ -314,7 +314,7 @@ class ResNetFeedForwardSP_cifar(BaseBackbone):
         else:
             return None, layer, gate_layer
 
-    def forward(self, x):
+    def forward(self, x, img_metas = None, result_file = None):
         """Return output logits, masks(gate ouputs) and probabilities
         associated to each gate."""
 

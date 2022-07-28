@@ -224,8 +224,7 @@ def main():
                                  args.gpu_collect)
 
     rank, _ = get_dist_info()
-    if False:
-        masks = model_object.special_metrics
+   
     if rank == 0:
         results = {}
         logger = get_root_logger()

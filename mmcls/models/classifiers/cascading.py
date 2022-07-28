@@ -1,4 +1,5 @@
 from cv2 import threshold
+from importlib_metadata import pass_none
 from ..builder import CLASSIFIERS, build_backbone, build_head, build_neck
 from ..heads import MultiLabelClsHead
 from ..utils.augment import Augments
@@ -24,6 +25,7 @@ class Cascading(BaseClassifier):
                  init_delta=0.1,
                  pretrained_little = None,
                  pretrained_big = None,
+                 get_infos = None,
                  beta = 0.85, # which denodes how much percentage sm from big is lesss important then from little
                  init_cfg=None,
                  train_cfg=None):
@@ -44,6 +46,7 @@ class Cascading(BaseClassifier):
         self.PSI = 0
         self.PSI_delta = 0
         self.augments = None
+        self.get_infos = get_infos
         if train_cfg is not None:
             augments_cfg = train_cfg.get('augments', None)
             if augments_cfg is not None:
@@ -84,7 +87,14 @@ class Cascading(BaseClassifier):
 
         return losses    
 
-        
+    def writeInfos(self, mask, get_infos,  kwargs):
+        heavy = ""
+        for i in mask:
+          heavy += kwargs["img_metas"][int(i)]["filename"] + "\n"
+        f = open(get_infos, "a")
+        f.write(heavy)
+        f.close()
+
     
     def simple_test(self, img, **kwargs):
         """
@@ -94,9 +104,10 @@ class Cascading(BaseClassifier):
         res = self.little_head.simple_test(res)
         score = torch.tensor(np.array(res)).topk(2).values.transpose(1,0)
         sm = score[0]- score[1]
-        mask = torch.nonzero((sm) < self.threshold) #need <
+        mask_1 = torch.nonzero((sm) < self.threshold) #need <
+       
         im_shape = img.shape
-        img_max = img[mask]
+        img_max = img[mask_1]
         sm_max = sm
         res_threshold = res
         if img_max.shape[0] > 0:
@@ -109,11 +120,11 @@ class Cascading(BaseClassifier):
             sm_big = score_big[0]- score_big[1]
             #maybe there are more elegant ways
             
-            for (i, re) in zip(mask, res_big):
+            for (i, re) in zip(mask_1, res_big):
                 res_threshold[i] = re
                 sm_max[i] = sm_big[i]
-        mask = torch.nonzero((sm) < (self.threshold + self.delta))
-        img_min = img[mask]
+        mask_2 = torch.nonzero((sm) < (self.threshold + self.delta))
+        img_min = img[mask_2]
         sm_min = sm
         res_delta = res
         if img_min.shape[0] > 0:
@@ -126,12 +137,16 @@ class Cascading(BaseClassifier):
             sm_big = score_big[0]- score_big[1]
             #maybe there are more elegant ways
             
-            for (i, re) in zip(mask, res_big):
+            for (i, re) in zip(mask_2, res_big):
                 res_delta[i] = re
                 sm_min[i] = sm_big[i]
         res = res_delta if self.delta > 0 else  res_threshold
             #res = torch.tensor(res)
-        if self.threshold > 1: 
+        #if self.get_infos:
+        mask = mask_2 if self.delta > 0 else  mask_1
+        self.writeInfos(mask, self.get_infos, kwargs)
+
+        if self.threshold > 1 and self.PSI <= self.PSI_delta and self.delta > 0: 
             return res 
             #because over 1 is not possible 
       
