@@ -48,7 +48,7 @@ def main():
         ax.scatter(x=time[i], y=acc[i], label= models[i])
     ax.legend()
     #ride now this doesn't help 
-    #ax1.invert_yaxis()
+    ax.invert_xaxis()
     #ax2 = ax1.twinx()
     #ax2 = ax2.scatter(x=plot_x,y=plot_y1, color="blue")
     
