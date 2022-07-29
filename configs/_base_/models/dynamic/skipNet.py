@@ -1,14 +1,15 @@
+from tokenize import Special
 from numpy import block
 
 
 model = dict(
-    type='ImageClassifier',
+    type='ImageClassifier_dynamic',
     backbone=dict(
         type='ResNetFeedForwardSP',
         layers=[2,2,2,2],
-        gate_type= 'ffgate1'
+        gate_type= 'ffgate1',
         ),
-   
+    special = "skip",
     head=dict(
         type='LinearClsHead',
         num_classes=10,

@@ -1,5 +1,6 @@
 import argparse
 from ast import arg
+from tkinter import Y
 from unittest import result
 import matplotlib.pyplot as plt
 
@@ -18,34 +19,44 @@ def parse_args():
     args = parser.parse_args()
     return args
 def main():
-    args = parse_args()
+    #args = parse_args()
     plot_x = []
     plot_y1 = []
     plot_y2 = []
     results = defaultdict()
-    models = args.results_configs.split(",")
-    for model in models:
-        with open(model) as f:
-            model = model.split("/")[-1]
-            model = model.replace(".json","")
-            data = json.load(f)
-            results[model] = defaultdict()
-            results[model]["pred_score"] = mean(data["pred_score"])
-            results[model]["avg_time_batch"] = data["avg_time_batch"]
-            results[model]["totall_time"] = data["time"]
-            plot_y1.append(results[model]["pred_score"])
-            plot_y2.append(results[model]["totall_time"])
-            plot_x.append(model)
-    json.dump(results, open(args.all_configs, "w"))
-    fig, ax1 = plt.subplots()
-    ax1.scatter(x=plot_x, y=plot_y2, color="red")
+    #
+    # models = args.results_configs.split(",")
+    #for model in models:
+    #    with open(model) as f:
+    #        model = model.split("/")[-1]
+    #        model = model.replace(".json","")
+    #        data = json.load(f)
+    #        results[model] = defaultdict()
+    #        results[model]["pred_score"] = mean(data["pred_score"])
+    #        results[model]["avg_time_batch"] = data["avg_time_batch"]
+    #        results[model]["totall_time"] = data["time"]
+    #        plot_y1.append(results[model]["pred_score"])
+    #        plot_y2.append(results[model]["totall_time"])
+    #        plot_x.append(model)
+    #json.dump(results, open(args.all_configs, "w"))
+    #cifar10
+    #acc = [94.82, 95.55, 95.51, 91.48]
+    #time = [7,18, 12, 11]
+    #imagenette
+    acc = [93.25,93.43, 93.99,  87, 90]
+    time = [17,19, 17, 19, 17]
+    models = ["resnet18", "resnet50",  "little/big net", "skipnet-ffgate1", "skipnet-rnngate"]
+    fig, ax = plt.subplots()
+    for i in range(len(acc)):
+        ax.scatter(x=time[i], y=acc[i], label= models[i])
+    ax.legend()
     #ride now this doesn't help 
-    #ax1.invert_yaxis()
-    ax2 = ax1.twinx()
-    ax2 = ax2.scatter(x=plot_x,y=plot_y1, color="blue")
+    ax.invert_xaxis()
+    #ax2 = ax1.twinx()
+    #ax2 = ax2.scatter(x=plot_x,y=plot_y1, color="blue")
     
     
-    fig.legend(["time","accurancy"])
+    #+fig.legend(models)
     plt.show()
 
 

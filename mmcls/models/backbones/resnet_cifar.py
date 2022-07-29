@@ -68,7 +68,7 @@ class ResNet_CIFAR(ResNet):
         self.add_module(self.norm1_name, norm1)
         self.relu = nn.ReLU(inplace=True)
 
-    def forward(self, x):
+    def forward(self, x, img_metas=None, result_file= None):
         x = self.conv1(x)
         x = self.norm1(x)
         x = self.relu(x)
