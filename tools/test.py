@@ -183,15 +183,6 @@ def main():
         warnings.warn('Class names are not saved in the checkpoint\'s '
                       'meta data, use imagenet by default.')
         CLASSES = ImageNet.CLASSES
-    totall_flops = []
-    #for i, data in enumerate(data_loader):
-    #    with torch.no_grad():
-                            
-    #        flops = FlopCountAnalysis(model.cuda(), (data["img"].cuda(), False))
-            #flops_2, params = get_model_complexity_info(model, img)
-    #        totall_flops.append(flops.total())
-    #    avg_flops = sum(totall_flops)/len(totall_flops)
-    #    print(avg_flops)
             
     start_time = time.time()
     if not distributed:
@@ -258,10 +249,7 @@ def main():
                     'time': time.time()-start_time,
                     'avg_time_batch': (time.time() - start_time) / (len(scores)/test_loader_cfg['samples_per_gpu'])
                 }
-                if True:  # TODO define args to deside
-                    
-                    print("test")
-                    
+               
                     
                 if 'all' in args.out_items:
                     results.update(res_items)

@@ -40,9 +40,12 @@ def main():
     #        plot_x.append(model)
     #json.dump(results, open(args.all_configs, "w"))
     #cifar10
-    acc = [94.82, 95.55, 95.51, 91.48]
-    time = [7,18, 12, 11]
-    models = ["resnet18", "resnet50",  "little/big net", "skipnet-ffgate2"]
+    #acc = [94.82, 95.55, 95.51, 91.48]
+    #time = [7,18, 12, 11]
+    #imagenette
+    acc = [93.25,93.43, 93.99,  87, 90]
+    time = [17,19, 17, 19, 17]
+    models = ["resnet18", "resnet50",  "little/big net", "skipnet-ffgate1", "skipnet-rnngate"]
     fig, ax = plt.subplots()
     for i in range(len(acc)):
         ax.scatter(x=time[i], y=acc[i], label= models[i])
