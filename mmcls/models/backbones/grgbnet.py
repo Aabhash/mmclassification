@@ -9,26 +9,25 @@ from torch import load, save, sum, max
 import torch.nn as nn
 from torchvision.transforms import Grayscale
 
-import pdb
-
 from ..builder import BACKBONES
 from . import ResNet
 
 @BACKBONES.register_module()
 class GRGBnet_Base(nn.Module):
     
-    """ The BaseBlock of my BranchyNet Version. 
-        It contains the first layer and the first exit.
-        It also keeps hold of the whole loaded ResNet.
-
+    """ Class of a basic GRGBnet. (no Extensions implemented so far)
+        Basic Idea: Try to classify an image with a greysale Res-Net-18.
+        If Class Probability < Threshhold -> Classify it with RGB-Res-Net-18
     """
 
-    def __init__(self, use_grayscale: Boolean = True, use_rgb: Boolean = True):
+    def __init__(self, use_grayscale: Boolean = True, use_rgb: Boolean = True,
+                       threshhold: float = 0.80):
 
         super(GRGBnet_Base, self).__init__()
 
         assert(use_grayscale or use_rgb)
         
+        self.threshhold = threshhold
         self.use_grayscale = use_grayscale
         self.use_rgb = use_rgb
         
@@ -49,9 +48,6 @@ class GRGBnet_Base(nn.Module):
             nn.Conv2d(512, 512, 3, 2, padding=1),
             nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
             nn.ReLU(),
-            # nn.Conv2d(512, 512, 3, 1, padding=0),
-            # nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
-            # nn.ReLU(),
             nn.AvgPool2d(2, stride=1, padding=0),
             nn.Flatten(),
             nn.Linear(4608, 10),
@@ -107,7 +103,7 @@ class GRGBnet_Base(nn.Module):
             if not self.use_rgb:
                 return grayscale_output
             else:
-                mask_grayscale = (max(grayscale_output, axis=1)[0] >= 0.80)
+                mask_grayscale = (max(grayscale_output, axis=1)[0] >= self.threshhold)
                 y += mask_grayscale.reshape(-1,1) * grayscale_output 
 
         if self.use_rgb:        
@@ -121,13 +117,16 @@ class GRGBnet_Base(nn.Module):
         return y
 
 def mask_down(t: Tensor, mask: Tensor) -> Tensor:
+    ''' This method takes a vector and downzises it, so that the new tensor
+        has its values where the mask has its ones.'''
+
     mask = mask.reshape(-1)
 
     return t[mask.bool()]
 
 def mask_up(t: Tensor, mask: Tensor) -> Tensor:
     '''This method takes a downsized vector and upsizes it again, so that the new tensor
-        has its values where the mask has its Ones.'''
+        has its values where the mask has its ones.'''
     mask = mask.reshape(-1)
     
     bs = mask.size()[0]
