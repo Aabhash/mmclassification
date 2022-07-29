@@ -18,7 +18,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/001_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet001.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 010" 
@@ -28,7 +28,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/010_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet010.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 011"
@@ -38,7 +38,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/011_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet011.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 100" 
@@ -48,7 +48,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/100_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet100.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 101" 
@@ -58,7 +58,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/101_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet101.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 110" 
@@ -68,7 +68,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/110_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet110.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 echo "Configuration: 111"
 echo "Configuration: 111" >> $LOG_FILE
@@ -77,7 +77,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/111_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet110.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 echo "--------------------------------------------- /n"
 
@@ -97,7 +97,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/001_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet001.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 010" 
@@ -107,7 +107,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/010_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet010.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 011"
@@ -117,7 +117,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/011_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet011.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 100" 
@@ -127,7 +127,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/100_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet100.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 101" 
@@ -137,7 +137,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/101_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet101.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 110" 
@@ -147,7 +147,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/110_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet110.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 111"
@@ -157,7 +157,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/111_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet110.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 echo "--------------------------------------------- /n"
 
@@ -177,7 +177,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/001_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet001.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 echo "Configuration: 010" 
 echo "Configuration: 010" >> $LOG_FILE
@@ -186,7 +186,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/010_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet010.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 011"
@@ -196,7 +196,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/011_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet011.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 100" 
@@ -206,7 +206,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/100_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet100.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 101" 
@@ -216,7 +216,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/101_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet101.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 110" 
@@ -226,7 +226,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/110_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet110.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 111"
@@ -236,7 +236,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/111_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet110.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 echo "--------------------------------------------- /n"
 
@@ -256,7 +256,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/001_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet001.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 010" 
@@ -266,7 +266,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/010_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet010.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 011"
@@ -276,7 +276,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/011_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet011.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 100" 
@@ -286,7 +286,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/100_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet100.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 101" 
@@ -296,7 +296,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/101_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet101.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 110" 
@@ -306,7 +306,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/110_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet110.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 111"
@@ -316,7 +316,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/111_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet110.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 echo "--------------------------------------------- /n"
 
@@ -336,7 +336,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/001_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet001.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 010" 
@@ -346,7 +346,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/010_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet010.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 011"
@@ -356,7 +356,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/011_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet011.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 100" 
@@ -366,7 +366,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/100_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet100.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 101" 
@@ -376,7 +376,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/101_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet101.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 110" 
@@ -386,7 +386,7 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/110_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet110.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
 
 echo "Configuration: 111"
@@ -396,5 +396,5 @@ time="$(time( python3 tools/test.py $CONFIG_FOLDER/111_BranchyNet-Imagenette2.py
         $CPT_FILE --metrics=accuracy \
         --out=$OUT_DIR/val_branchynet110.json >> $LOG_FILE) 2>&1 1>/dev/null )"
 echo "Wallclock Time elapsed:" | echo $time 
-"Wallclock Time elapsed:" >> $LOG_FILE | $time >> $LOG_FILE
+echo "Wallclock Time elapsed:" >> $LOG_FILE | echo $time >> $LOG_FILE
 
