@@ -5,6 +5,8 @@ import warnings
 from numbers import Number
 from fvcore.nn import FlopCountAnalysis
 from mmcv.cnn.utils import get_model_complexity_info
+
+import time
 import mmcv
 import numpy as np
 import torch
@@ -17,7 +19,6 @@ from mmcls.apis import multi_gpu_test, single_gpu_test
 from mmcls.datasets import build_dataloader, build_dataset
 from mmcls.models import build_classifier
 from mmcls.utils import get_root_logger, setup_multi_processes
-import time
 
 
 def parse_args():
@@ -102,6 +103,7 @@ def parse_args():
     args = parser.parse_args()
     if 'LOCAL_RANK' not in os.environ:
         os.environ['LOCAL_RANK'] = str(args.local_rank)
+
     assert args.metrics or args.out, \
         'Please specify at least one of output path and evaluation metrics.'
 
@@ -121,7 +123,7 @@ def main():
     # set cudnn_benchmark
     if cfg.get('cudnn_benchmark', False):
         torch.backends.cudnn.benchmark = True
-    #cfg.model.pretrained = None
+    cfg.model.pretrained = None
 
     if args.gpu_ids is not None:
         cfg.gpu_ids = args.gpu_ids[0:1]
@@ -139,8 +141,10 @@ def main():
         distributed = True
         init_dist(args.launcher, **cfg.dist_params)
 
-    dataset = build_dataset(cfg.data.val, default_args=dict(
-        test_mode=True))  # this also have to be discussed
+    try:
+        dataset = build_dataset(cfg.data.test, default_args=dict(test_mode=True))
+    except AttributeError:
+        dataset = build_dataset(cfg.data.val, default_args=dict(test_mode=True))
 
     # build the dataloader
     # The default loader config
@@ -183,7 +187,7 @@ def main():
         warnings.warn('Class names are not saved in the checkpoint\'s '
                       'meta data, use imagenet by default.')
         CLASSES = ImageNet.CLASSES
-            
+
     start_time = time.time()
     if not distributed:
         if args.device == 'cpu':
@@ -210,10 +214,9 @@ def main():
             model.cuda(),
             device_ids=[torch.cuda.current_device()],
             broadcast_buffers=False)
-
         outputs = multi_gpu_test(model, data_loader, args.tmpdir,
                                  args.gpu_collect)
-
+    print(time.time()-start_time)
     rank, _ = get_dist_info()
    
     if rank == 0:
@@ -240,14 +243,13 @@ def main():
                 pred_score = np.max(scores, axis=1)
                 pred_label = np.argmax(scores, axis=1)
                 pred_class = [CLASSES[lb] for lb in pred_label]
-                print(test_loader_cfg)
                 res_items = {
                     'class_scores': scores,
                     'pred_score': pred_score,
                     'pred_label': pred_label,
                     'pred_class': pred_class,
                     'time': time.time()-start_time,
-                    'avg_time_batch': (time.time() - start_time) / (len(scores)/test_loader_cfg['samples_per_gpu'])
+                    'avg_time_batch': (time.time() - start_time) / (len(scores) / test_loader_cfg['samples_per_gpu'])
                 }
                
                     

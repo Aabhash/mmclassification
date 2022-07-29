@@ -37,6 +37,7 @@ from .vision_transformer import VisionTransformer
 from .skipnet import ResNetFeedForwardSP
 from .skipnet_cifar import ResNetFeedForwardSP_cifar
 from .skipnet import RecurrentGatedResNet
+from .dn_cgnet import CGResNet
 
 
 __all__ = [
@@ -47,5 +48,5 @@ __all__ = [
     'Conformer', 'MlpMixer', 'DistilledVisionTransformer', 'PCPVT', 'SVT',
     'EfficientNet', 'ConvNeXt', 'HRNet', 'ResNetV1c', 'ConvMixer',
     'CSPDarkNet', 'CSPResNet', 'CSPResNeXt', 'CSPNet', 'RepMLPNet',
-    'PoolFormer', 'DenseNet', 'VAN', 'ResNetFeedForwardSP', 'ResNetFeedForwardSP_cifar', 'RecurrentGatedResNet'
+    'PoolFormer', 'DenseNet', 'VAN', 'ResNetFeedForwardSP', 'ResNetFeedForwardSP_cifar', 'RecurrentGatedResNet', 'CGResNet'
 ]
