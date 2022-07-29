@@ -75,7 +75,6 @@ class GRGBnet_Base(nn.Module):
     def forward_train(self, x: Tensor) -> Tensor:
         """ The standard use case for train is with rgb and grayscale. But 
             other settings are possible."""
-        pdb.set_trace()
         if self.use_rgb:  
             y1 = self.model_rgb(x)[0]
             y1 = self.rgb_head(y1)
@@ -114,7 +113,6 @@ class GRGBnet_Base(nn.Module):
         if self.use_rgb:        
             mask_grayscale = mask_grayscale <= 0.5
             x = mask_down(x, mask_grayscale)
-            pdb.set_trace()
             x = self.model_rgb(x)[0]
             rgb_output = mask_up(self.rgb_head(x), mask_grayscale) 
 
@@ -123,7 +121,6 @@ class GRGBnet_Base(nn.Module):
         return y
 
 def mask_down(t: Tensor, mask: Tensor) -> Tensor:
-    pdb.set_trace()
     mask = mask.reshape(-1)
 
     return t[mask.bool()]
@@ -131,11 +128,13 @@ def mask_down(t: Tensor, mask: Tensor) -> Tensor:
 def mask_up(t: Tensor, mask: Tensor) -> Tensor:
     '''This method takes a downsized vector and upsizes it again, so that the new tensor
         has its values where the mask has its Ones.'''
-    pdb.set_trace()
     mask = mask.reshape(-1)
     
     bs = mask.size()[0]
     output = zeros(bs, *(list(t.size())[1: ]))
+
+    if cuda.is_available():
+        output = output.to('cuda')
 
     output[mask] = t
 

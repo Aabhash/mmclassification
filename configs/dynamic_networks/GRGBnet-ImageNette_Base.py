@@ -4,7 +4,7 @@ model = dict(
         type='GRGBnet_Base',
         use_rgb= True,
         use_grayscale = True,
-    )
+    ),
     head=dict(
         type='emptyClsHead',     # linear classification head，
         loss=dict(type='BranchyNetLoss'), # Loss function configuration information
@@ -58,10 +58,14 @@ optimizer = dict(type='SGD',         # Optimizer type
 # Config used to build the optimizer hook, refer to https://github.com/open-mmlab/mmcv/blob/master/mmcv/runner/hooks/optimizer.py#L8 for implementation details.
 optimizer_config = dict(grad_clip=None)  # Most of the methods do not use gradient clip
 # Learning rate scheduler config used to register LrUpdater hook
-lr_config = dict(policy='step',          # The policy of scheduler, also support CosineAnnealing, Cyclic, etc. Refer to details of supported LrUpdater from https://github.com/open-mmlab/mmcv/blob/master/mmcv/runner/hooks/lr_updater.py#L9.
-                 step=[10, 20, 30])      # Steps to decay the learning rate
+lr_config = dict(
+    policy='CosineAnnealing',
+    min_lr=0.00001,
+    warmup='linear',
+    warmup_iters=25025,
+    warmup_ratio=0.25)
 runner = dict(type='EpochBasedRunner',   # Type of runner to use (i.e. IterBasedRunner or EpochBasedRunner)
-            max_epochs=50)    # Runner that runs the workflow in total max_epochs. For IterBasedRunner use `max_iters`
+            max_epochs=350)    # Runner that runs the workflow in total max_epochs. For IterBasedRunner use `max_iters`
 
 # Config to set the checkpoint hook, Refer to https://github.com/open-mmlab/mmcv/blob/master/mmcv/runner/hooks/checkpoint.py for implementation.
 checkpoint_config = dict(interval=1)    # The save interval is 1
