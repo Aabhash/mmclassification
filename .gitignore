@@ -125,7 +125,7 @@ venv.bak/
 .DS_Store
 
 # Pytorch
-*.pth
+# *.pth
 
 # IPU
 *.pvti
