@@ -193,9 +193,6 @@ class FeedforwardGateII(BaseModule):
         return x, logprob
 
 
-<<<<<<< HEAD
-@BACKBONES.register_module()
-=======
 def writeInfos(masks, result_file,  kwargs):
     f = open(result_file, "a")
     masks = torch.stack(masks).T
@@ -211,7 +208,6 @@ def writeInfos(masks, result_file,  kwargs):
 
 
 @ BACKBONES.register_module()
->>>>>>> testing-around
 class ResNetFeedForwardSP(BaseBackbone):
     """ SkipNets with Feed-forward Gates for Supervised Pre-training stage.
     Adding one routing module after each basic block."""
@@ -221,26 +217,6 @@ class ResNetFeedForwardSP(BaseBackbone):
         self.inplanes=64
         super(ResNetFeedForwardSP, self).__init__()
 
-<<<<<<< HEAD
-        self.num_layers = layers
-        self.conv1 = self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
-                                            bias=False)
-        self.bn1 = nn.BatchNorm2d(64)
-        self.relu = nn.ReLU(inplace=True)
-        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-
-        block = BasicBlock
-        self.gate_type = gate_type
-        self._make_group(
-            block, 64, layers[0], gate_type=gate_type, group_id=1, pool_size=56)
-        self._make_group(
-            block, 128, layers[1], gate_type=gate_type, group_id=2, pool_size=28)
-        self._make_group(
-            block, 256, layers[2], gate_type=gate_type, group_id=3, pool_size=14)
-        self._make_group(
-            block, 512, layers[3],  gate_type=gate_type, group_id=4, pool_size=7)
-        self.avgpool = nn.AvgPool2d(7)
-=======
         self.num_layers=layers
         self.conv1=self.conv1=nn.Conv2d(3, 64, kernel_size = 7, stride = 2, padding = 3,
                                bias = False)
@@ -259,7 +235,6 @@ class ResNetFeedForwardSP(BaseBackbone):
         self._make_group(
             block, 512, layers[3],  gate_type = gate_type, group_id = 4, pool_size = 7)
         self.avgpool=nn.AvgPool2d(7)
->>>>>>> testing-around
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
