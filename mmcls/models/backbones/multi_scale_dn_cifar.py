@@ -12,24 +12,13 @@ class InitialLayer(nn.Module):
     """
     First layer of RANet, Generate base features.
     """
-    def __init__(self, in_c, out_c, gr_factor, n_scales=3):
+    def __init__(self, in_c, out_c, n_scales=3):
         super().__init__()
         self.layers = nn.ModuleList()
-        self.layers.append(nn.Sequential(
-            nn.Conv2d(
-                in_c,
-                out_c,
-                7,2,3
-            ),
-            nn.BatchNorm2d(out_c),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(3,2,1)
-        ))
-        in_c = out_c
-        for i in range(1, n_scales):
+
+        for i in range(n_scales):
             stride = 1 if i == 0 else 2
-            # out_channel = out_c * (2**i)
-            out_channel = out_c * gr_factor[i]
+            out_channel = out_c * (2**i)
             self.layers.append(nn.Sequential(
                 nn.Conv2d(
                     in_c,
@@ -331,29 +320,29 @@ class Classifier(nn.Module):
             nn.Sequential(
                 nn.Conv2d(
                     channel,
-                    channel,
+                    size,
                     kernel_size=3,
                     stride=2,
                     padding=1,
                     bias=False
                 ),
-                nn.BatchNorm2d(channel),
+                nn.BatchNorm2d(size),
                 nn.ReLU(inplace=True)),
             nn.Sequential(
                 nn.Conv2d(
-                    channel,
-                    channel,
+                    size,
+                    size,
                     kernel_size=3,
                     stride=2,
                     padding=1,
                     bias=False
                 ),
-                nn.BatchNorm2d(channel),
+                nn.BatchNorm2d(size),
                 nn.ReLU(inplace=True),
             ),
             nn.AvgPool2d(2)
         )
-        self.linear = nn.Linear(channel, cls_labels)
+        self.linear = nn.Linear(size, cls_labels)
     
     def forward(self, x):
         out = self.model(x)
@@ -361,7 +350,7 @@ class Classifier(nn.Module):
 
 
 @BACKBONES.register_module()
-class MultiScaleNet(BaseBackbone):
+class MultiScaleNetCifar(BaseBackbone):
     def __init__(self,
         growth_rate = 32,
         reduction_rate = 0.5,
@@ -374,17 +363,15 @@ class MultiScaleNet(BaseBackbone):
         stepmode = "even",
         step = 8,
         bnwidth = [4, 2, 1],
-        gr_factor = [1, 2, 4],
         cls_labels = 10,
     ):
         super().__init__()
         self.n_scales = n_scales
-        self.init_layer = InitialLayer(3, channels, gr_factor, n_scales=n_scales)
+        self.init_layer = InitialLayer(3, channels, n_scales=n_scales)
         
         self.classifier = nn.ModuleList()
         self.scale_flow_list = nn.ModuleList()
 
-        gr_factor = gr_factor[::-1]
         steps = [step]
 
         # Blocks in every scale, [0, 2, 4, 6, 8]
@@ -395,14 +382,14 @@ class MultiScaleNet(BaseBackbone):
         for i in range(n_scales):
             scale_flow = nn.ModuleList()
 
-            # mul = 2 ** (n_scales - i - 1)
+            mul = 2 ** (n_scales - i - 1)
             
-            in_c = channels * gr_factor[i]
+            in_c = channels * (mul)
             in_c_lf = []
             block = 1
             
             for j in range(self.blocks_per_flow[i+1]):
-                growth_rate = gr * gr_factor[i]
+                growth_rate = gr * mul
 
                 transition = False
 
@@ -475,7 +462,6 @@ class MultiScaleNet(BaseBackbone):
                 in_c = out_channels[-1]
                 in_c_lf.append(out_channels[:-1])
 
-
                 if block > self.blocks_per_flow[i]:
                     self.classifier.append(
                         Classifier(channel=in_c, cls_labels=cls_labels)
@@ -483,7 +469,6 @@ class MultiScaleNet(BaseBackbone):
                 block += 1
 
             in_c_lfs = in_c_lf
-            
             self.scale_flow_list.append(scale_flow)
 
         for sf in self.scale_flow_list:

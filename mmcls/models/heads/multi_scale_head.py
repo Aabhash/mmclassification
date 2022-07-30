@@ -5,8 +5,7 @@ import torch.nn as nn
 from ..builder import HEADS, build_loss
 from ..utils import is_tracing
 from .base_head import BaseHead
-from mmcls.models.losses import Accuracy
-import time
+
 
 @HEADS.register_module()
 class MultiScaleHead(BaseHead):
@@ -27,10 +26,13 @@ class MultiScaleHead(BaseHead):
 
         self.topk = topk
         self.compute_loss = build_loss(loss)
-        self.compute_accuracy = Accuracy(topk=self.topk)
+        # self.compute_accuracy = Accuracy(topk=self.topk)
         self.softmax = nn.Softmax(dim=1).cuda()
         self.simple_softmax = nn.Softmax(dim=0).cuda()
-        self.T = torch.Tensor([0.5] * (num_exits-1) + [0])
+
+        # self.T = torch.Tensor([0.65] * (num_exits-1) + [0])
+        self.T = torch.hstack((torch.linspace(0.8, 0.5, (num_exits-1)), torch.tensor([[0]])))
+
         self.exit_tracker = {ncls:0 for ncls in range(num_exits)}
         self.total_time = 0
 
@@ -40,7 +42,7 @@ class MultiScaleHead(BaseHead):
         losses = dict()
 
         # _gt_label = torch.abs(gt_label)
-        
+
         # Calculate loss
         loss = 0.0
         for score in cls_scores:
@@ -81,7 +83,7 @@ class MultiScaleHead(BaseHead):
                     curr_idx = max_preds.ge(self.T[k]).nonzero().squeeze()
                     og_idx = left_to_track_idx[curr_idx]
                     left_to_track_idx = left_to_track_idx[max_preds.le(self.T[k]).nonzero().squeeze()]
-         
+
                     pred[og_idx] = logits[curr_idx]
                     self.exit_tracker[k] += curr_idx.numel()
                 except IndexError:
