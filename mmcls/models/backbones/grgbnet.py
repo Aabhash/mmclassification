@@ -1,5 +1,6 @@
 # Copyright (c) Carl. All rights reserved.
 from ipaddress import v6_int_to_packed
+from tokenize import String
 from xmlrpc.client import Boolean, boolean
 from matplotlib.ft2font import BOLD
 
@@ -60,15 +61,15 @@ class GRGBnet_Base(nn.Module):
             nn.Softmax(dim = 1))
 
 
-    def forward(self, img: Tensor, return_loss: Boolean = False) -> Tensor:
+    def forward(self, img: Tensor, return_loss: Boolean = False, log_file: String=None) -> Tensor:
         img = img.to(self.device)
 
         if return_loss:
-            return self.forward_train(img)
+            return self.forward_train(img, log_file)
         else:
-            return self.forward_test(img)
+            return self.forward_test(img, log_file)
 
-    def forward_train(self, x: Tensor) -> Tensor:
+    def forward_train(self, x: Tensor, log_file: String=None) -> Tensor:
         """ The standard use case for train is with rgb and grayscale. But 
             other settings are possible."""
         if self.use_rgb:  
@@ -87,10 +88,10 @@ class GRGBnet_Base(nn.Module):
 
         return y2
 
-    def simple_test(self, x: Tensor) -> Tensor:
-        return forward_test(self, x)
+    def simple_test(self, x: Tensor, log_file: String=None) -> Tensor:
+        return forward_test(self, x, log_file)
     
-    def forward_test(self, x: Tensor)-> Tensor:
+    def forward_test(self, x: Tensor, log_file: String=None)-> Tensor:
         
         '''init batchsize, input mask and result'''
         
@@ -108,7 +109,14 @@ class GRGBnet_Base(nn.Module):
                 return grayscale_output
             else:
                 mask_grayscale = (max(grayscale_output, axis=1)[0] >= self.threshhold)
-                y += mask_grayscale.reshape(-1,1) * grayscale_output 
+                y += mask_grayscale.reshape(-1,1) * grayscale_output
+                
+                if log_file:
+                    # Here the logging of the Exits of different Images takes Place
+                    # Assuming that the image names are written elsewhere in the training loop
+                    file_object = open(log_file, 'a')
+                    file_object.write(str(mask_grayscale))
+                    file_object.close() 
 
         '''Forward through RGB'''
         if self.use_rgb:        
