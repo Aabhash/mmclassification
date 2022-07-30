@@ -16,6 +16,7 @@ model = dict(
         gr_factor = [1, 2, 2, 4],
         cls_labels = 10,
     ),
+    get_infos='./results/multiscale-ranet/exits.json',
     neck=None,
     head=dict(
         type='MultiScaleHead',

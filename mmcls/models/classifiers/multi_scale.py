@@ -12,10 +12,12 @@ class MultiScaleClassifier(BaseClassifier):
                  neck=None,
                  head=None,
                  train_cfg=None,
+                 get_infos=None,
                  init_cfg=None,
                  pretrained=None):
         super().__init__(init_cfg)
 
+        self.get_infos = get_infos
         self.backbone = build_backbone(backbone)
         self.n_classifiers = 0
 
@@ -54,6 +56,6 @@ class MultiScaleClassifier(BaseClassifier):
     def simple_test(self, img, **kwargs):
         """Test without augmentation."""
         x = self.extract_feat(img)
-        res = self.head.simple_test(x, **kwargs)
+        res = self.head.simple_test(x, result_file=self.get_infos, **kwargs)
 
         return res
