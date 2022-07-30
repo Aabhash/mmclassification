@@ -3,6 +3,8 @@ import argparse
 import os
 import warnings
 from numbers import Number
+from fvcore.nn import FlopCountAnalysis
+from mmcv.cnn.utils import get_model_complexity_info
 
 import time
 import mmcv
@@ -139,7 +141,10 @@ def main():
         distributed = True
         init_dist(args.launcher, **cfg.dist_params)
 
-    dataset = build_dataset(cfg.data.test, default_args=dict(test_mode=True))
+    try:
+        dataset = build_dataset(cfg.data.test, default_args=dict(test_mode=True))
+    except AttributeError:
+        dataset = build_dataset(cfg.data.val, default_args=dict(test_mode=True))
 
     # build the dataloader
     # The default loader config
@@ -168,6 +173,7 @@ def main():
 
     # build the model and load checkpoint
     model = build_classifier(cfg.model)
+    model_object = model.eval()
     fp16_cfg = cfg.get('fp16', None)
     if fp16_cfg is not None:
         wrap_fp16_model(model)
@@ -212,6 +218,7 @@ def main():
                                  args.gpu_collect)
     print(time.time()-start_time)
     rank, _ = get_dist_info()
+   
     if rank == 0:
         results = {}
         logger = get_root_logger()
@@ -244,13 +251,15 @@ def main():
                     'time': time.time()-start_time,
                     'avg_time_batch': (time.time() - start_time) / (len(scores) / test_loader_cfg['samples_per_gpu'])
                 }
+               
+                    
                 if 'all' in args.out_items:
                     results.update(res_items)
                 else:
                     for key in args.out_items:
                         results[key] = res_items[key]
             print(f'\ndumping results to {args.out}')
-            mmcv.dump(results, args.out)
+            mmcv.dump(results, args.out, file_format='json')
 
 
 if __name__ == '__main__':

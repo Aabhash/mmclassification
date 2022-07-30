@@ -1,4 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+
 from .alexnet import AlexNet
 from .conformer import Conformer
 from .convmixer import ConvMixer
@@ -34,6 +35,11 @@ from .van import VAN
 from .vgg import VGG
 from .vision_transformer import VisionTransformer
 from .multi_scale_dn import MultiScaleNet
+from .skipnet import ResNetFeedForwardSP
+from .skipnet_cifar import ResNetFeedForwardSP_cifar
+from .skipnet import RecurrentGatedResNet
+from .dn_cgnet import CGResNet
+
 
 __all__ = [
     'LeNet5', 'AlexNet', 'VGG', 'RegNet', 'ResNet', 'ResNeXt', 'ResNetV1d',
@@ -43,5 +49,5 @@ __all__ = [
     'Conformer', 'MlpMixer', 'DistilledVisionTransformer', 'PCPVT', 'SVT',
     'EfficientNet', 'ConvNeXt', 'HRNet', 'ResNetV1c', 'ConvMixer',
     'CSPDarkNet', 'CSPResNet', 'CSPResNeXt', 'CSPNet', 'RepMLPNet',
-    'PoolFormer', 'DenseNet', 'VAN', 'MultiScaleNet'
+    'PoolFormer', 'DenseNet', 'VAN', 'ResNetFeedForwardSP', 'ResNetFeedForwardSP_cifar', 'RecurrentGatedResNet', 'CGResNet', 'MultiScaleNet'
 ]
