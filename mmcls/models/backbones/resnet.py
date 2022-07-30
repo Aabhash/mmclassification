@@ -629,7 +629,7 @@ class ResNet(BaseBackbone):
                 elif isinstance(m, BasicBlock):
                     constant_init(m.norm2, 0)
 
-    def forward(self, x):
+    def forward(self, x, img_metas=None, result_file=None):
         if self.deep_stem:
             x = self.stem(x)
         else:

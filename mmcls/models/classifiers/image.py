@@ -27,7 +27,7 @@ class ImageClassifier(BaseClassifier):
 
         if head is not None:
             self.head = build_head(head)
-        self.get_infos = get_infos
+        self.get_infos = "ffgate2_cifar.txt"
         self.augments = None
         if train_cfg is not None:
             augments_cfg = train_cfg.get('augments', None)

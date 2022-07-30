@@ -25,6 +25,7 @@ class Cascading(BaseClassifier):
                  init_delta=0.1,
                  pretrained_little = None,
                  pretrained_big = None,
+                 pretrained = None,
                  get_infos = None,
                  beta = 0.85, # which denodes how much percentage sm from big is lesss important then from little
                  init_cfg=None,
@@ -46,7 +47,7 @@ class Cascading(BaseClassifier):
         self.PSI = 0
         self.PSI_delta = 0
         self.augments = None
-        self.get_infos = get_infos
+        self.get_infos = "cascading_info"
         if train_cfg is not None:
             augments_cfg = train_cfg.get('augments', None)
             if augments_cfg is not None:
@@ -90,7 +91,10 @@ class Cascading(BaseClassifier):
     def writeInfos(self, mask, get_infos,  kwargs):
         heavy = ""
         for i in mask:
-          heavy += kwargs["img_metas"][int(i)]["filename"] + "\n"
+            if  "filename" in kwargs["img_metas"][int(i)]:
+                heavy += kwargs["img_metas"][int(i)]["filename"] + "\n"
+            else:
+                heavy += "imagedata are not avaible \n"
         f = open(get_infos, "a")
         f.write(heavy)
         f.close()
@@ -144,7 +148,8 @@ class Cascading(BaseClassifier):
             #res = torch.tensor(res)
         #if self.get_infos:
         mask = mask_2 if self.delta > 0 else  mask_1
-        self.writeInfos(mask, self.get_infos, kwargs)
+        if self.get_infos:
+            self.writeInfos(mask, self.get_infos, kwargs)
 
         if self.threshold > 1 and self.PSI <= self.PSI_delta and self.delta > 0: 
             return res 
@@ -168,16 +173,4 @@ class Cascading(BaseClassifier):
 
    
 
-    #def simple_test(self, img, **kwargs):
-    #  res = self.extract_feat(img,self.little,neck=self.little_neck,head=self.little_head)
-    #    res = self.little_head.simple_test(res)
-    #    score = torch.tensor(res).topk(2).values.transpose(1,0)
-    #    mask = torch.nonzero((score[0]- score[1]) < self.threshold) #need <
-    #    img = img[mask].squeeze()
-    #    if img.shape[0] > 0:
-    #        res_big = self.extract_feat(img,self.big, neck=self.big_neck, head=self.big_head)
-    #        #maybe there are more elegant ways
-    #        for (i, re) in zip(mask, res_big):
-    #            re = re.clone()
-    #            res[i] = re
-    #    return res
+    

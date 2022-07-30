@@ -3,13 +3,12 @@ from numpy import block
 
 
 model = dict(
-    type='ImageClassifier_dynamic',
+    type='ImageClassifier',
     backbone=dict(
         type='ResNetFeedForwardSP',
         layers=[2,2,2,2],
         gate_type= 'ffgate1',
         ),
-    special = "skip",
     head=dict(
         type='LinearClsHead',
         num_classes=10,
