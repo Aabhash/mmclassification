@@ -35,6 +35,8 @@ from .van import VAN
 from .vgg import VGG
 from .vision_transformer import VisionTransformer
 from .res_inter_classifiers import res_inter_classifiers
+from .multi_scale_dn import MultiScaleNet
+from .multi_scale_dn_cifar import MultiScaleNetCifar
 from .skipnet import ResNetFeedForwardSP
 from .skipnet_cifar import ResNetFeedForwardSP_cifar
 from .skipnet import RecurrentGatedResNet
@@ -49,9 +51,5 @@ __all__ = [
     'Conformer', 'MlpMixer', 'DistilledVisionTransformer', 'PCPVT', 'SVT',
     'EfficientNet', 'ConvNeXt', 'HRNet', 'ResNetV1c', 'ConvMixer',
     'CSPDarkNet', 'CSPResNet', 'CSPResNeXt', 'CSPNet', 'RepMLPNet',
-<<<<<<< HEAD
-    'PoolFormer', 'DenseNet', 'VAN', 'res_inter_classifiers'
-=======
-    'PoolFormer', 'DenseNet', 'VAN', 'ResNetFeedForwardSP', 'ResNetFeedForwardSP_cifar', 'RecurrentGatedResNet', 'CGResNet'
->>>>>>> 9280b45b97b6c5320463cc784dc26e65f0e40725
-]
+    'PoolFormer', 'DenseNet', 'VAN', 'ResNetFeedForwardSP', 'ResNetFeedForwardSP_cifar',
+    'RecurrentGatedResNet', 'CGResNet', 'MultiScaleNet', 'MultiScaleNetCifar', 'res_inter_classifiers']

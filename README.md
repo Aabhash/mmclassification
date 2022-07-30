@@ -200,3 +200,15 @@ This project is released under the [Apache 2.0 license](LICENSE).
 - configs/base/example.py path of model
 - mmcls/models/clasifier/__init__.py add ExampleClassifier to classifier
 - mmcls/models/clasifier/ExampleClassifier.py add ExampleClassifier to classifier
+
+## Run Scripts
+
+### Test Script
+```
+python .\tools\test.py .\configs\dynamic_subnets.py .\work_dirs\dynamic_subnets\epoch_9.pth --out .\work_dirs\dynamic_subnets\out.json --metrics accuracy
+```
+
+### Train Script
+```
+python .\tools\train.py --seed 0 .\configs\dynamic_subnets.py --resume-from .\work_dirs\dynamic_subnets\epoch_7.pth
+```
