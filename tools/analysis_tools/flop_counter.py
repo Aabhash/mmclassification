@@ -79,7 +79,8 @@ def measure_layer(layer, x):
     elif type_name in ['BatchNorm2d', 'Dropout2d', 'DropChannel', 'Dropout',
                        'MSDNFirstLayer', 'ConvBasic', 'ConvBN',
                        'ParallelModule', 'MSDNet', 'Sequential',
-                       'MSDNLayer', 'ConvDownNormal', 'ConvNormal', 'ClassifierModule']:
+                       'MSDNLayer', 'ConvDownNormal', 'ConvNormal', 'ClassifierModule',
+                       'Grayscale', 'Identity', 'Flatten', 'Softmax']:
         delta_params = get_layer_param(layer)
 
 
