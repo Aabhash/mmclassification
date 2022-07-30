@@ -7,6 +7,7 @@ from ..utils import is_tracing
 from .base_head import BaseHead
 from operator import itemgetter
 import json
+import time
 
 
 @HEADS.register_module()
@@ -36,6 +37,7 @@ class MultiScaleHead(BaseHead):
         self.T = torch.hstack((torch.linspace(0.8, 0.5, (num_exits-1)), torch.tensor([0])))
 
         self.exit_tracker = {ncls:[] for ncls in range(num_exits)}
+        self.exits = {ncls:0 for ncls in range(num_exits)}
         self.total_time = 0
 
 
@@ -99,6 +101,7 @@ class MultiScaleHead(BaseHead):
                 pred[og_idx] = logits[curr_idx]
                 for id in og_idx:
                     self.exit_tracker[k].append(metas[id])
+                    self.exits[k] += 1
                 # try:
                     # self.exit_tracker[k].append(itemgetter(*og_idx)(metas))
                 # except TypeError:
@@ -115,7 +118,7 @@ class MultiScaleHead(BaseHead):
         #     pred.append(logits)
 
         # self.total_time += (time.time() - st)
-        # print(self.total_time, self.exit_tracker)
+        # print(self.total_time, self.exits)
 
         if post_process:
             return self.post_process(pred)
