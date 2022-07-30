@@ -91,10 +91,14 @@ class GRGBnet_Base(nn.Module):
         return forward_test(self, x)
     
     def forward_test(self, x: Tensor)-> Tensor:
+        
+        '''init batchsize, input mask and result'''
+        
         bs = x.size()[0]
-        mask_grayscale = ones(bs).to(self.device)
+        mask_grayscale = zeros(bs).to(self.device)
         y = zeros(bs, 10).to(self.device)
 
+        '''Forward through Grayscale'''
         if self.use_grayscale:
             x_gray = self.grayscale(x)
             x_gray = self.model_grayscale(x_gray)[0]
@@ -106,7 +110,9 @@ class GRGBnet_Base(nn.Module):
                 mask_grayscale = (max(grayscale_output, axis=1)[0] >= self.threshhold)
                 y += mask_grayscale.reshape(-1,1) * grayscale_output 
 
+        '''Forward through RGB'''
         if self.use_rgb:        
+            ''' Invert greyscale mask'''
             mask_grayscale = mask_grayscale <= 0.5
             x = mask_down(x, mask_grayscale)
             x = self.model_rgb(x)[0]
