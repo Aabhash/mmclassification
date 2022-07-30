@@ -3,7 +3,10 @@ import argparse
 import os
 import warnings
 from numbers import Number
+from fvcore.nn import FlopCountAnalysis
+from mmcv.cnn.utils import get_model_complexity_info
 
+import time
 import mmcv
 import numpy as np
 import torch
@@ -138,7 +141,10 @@ def main():
         distributed = True
         init_dist(args.launcher, **cfg.dist_params)
 
-    dataset = build_dataset(cfg.data.test, default_args=dict(test_mode=True))
+    try:
+        dataset = build_dataset(cfg.data.test, default_args=dict(test_mode=True))
+    except AttributeError:
+        dataset = build_dataset(cfg.data.val, default_args=dict(test_mode=True))
 
     # build the dataloader
     # The default loader config
@@ -167,6 +173,7 @@ def main():
 
     # build the model and load checkpoint
     model = build_classifier(cfg.model)
+    model_object = model.eval()
     fp16_cfg = cfg.get('fp16', None)
     if fp16_cfg is not None:
         wrap_fp16_model(model)
@@ -181,6 +188,7 @@ def main():
                       'meta data, use imagenet by default.')
         CLASSES = ImageNet.CLASSES
 
+    start_time = time.time()
     if not distributed:
         if args.device == 'cpu':
             model = model.cpu()
@@ -198,6 +206,9 @@ def main():
                     'To test with CPU, please confirm your mmcv version ' \
                     'is not lower than v1.4.4'
         model.CLASSES = CLASSES
+        #img = torch.ones(1,3,32,32)
+        #flops = FlopCountAnalysis(model.cuda(), (img.cuda(), False))
+        #print(flops.by_module())
         show_kwargs = {} if args.show_options is None else args.show_options
         outputs = single_gpu_test(model, data_loader, args.show, args.show_dir,
                                   **show_kwargs)
@@ -208,8 +219,9 @@ def main():
             broadcast_buffers=False)
         outputs = multi_gpu_test(model, data_loader, args.tmpdir,
                                  args.gpu_collect)
-
+    print(time.time()-start_time)
     rank, _ = get_dist_info()
+   
     if rank == 0:
         results = {}
         logger = get_root_logger()
@@ -238,15 +250,19 @@ def main():
                     'class_scores': scores,
                     'pred_score': pred_score,
                     'pred_label': pred_label,
-                    'pred_class': pred_class
+                    'pred_class': pred_class,
+                    'time': time.time()-start_time,
+                    'avg_time_batch': (time.time() - start_time) / (len(scores) / test_loader_cfg['samples_per_gpu'])
                 }
+               
+                    
                 if 'all' in args.out_items:
                     results.update(res_items)
                 else:
                     for key in args.out_items:
                         results[key] = res_items[key]
             print(f'\ndumping results to {args.out}')
-            mmcv.dump(results, args.out)
+            mmcv.dump(results, args.out, file_format='json')
 
 
 if __name__ == '__main__':

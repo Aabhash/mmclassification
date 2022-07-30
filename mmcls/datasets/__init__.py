@@ -8,6 +8,7 @@ from .custom import CustomDataset
 from .dataset_wrappers import (ClassBalancedDataset, ConcatDataset,
                                KFoldDataset, RepeatDataset)
 from .imagenet import ImageNet
+from .imagenette import ImageNette
 from .imagenet21k import ImageNet21k
 from .mnist import MNIST, FashionMNIST
 from .multi_label import MultiLabelDataset
@@ -19,5 +20,5 @@ __all__ = [
     'VOC', 'MultiLabelDataset', 'build_dataloader', 'build_dataset',
     'DistributedSampler', 'ConcatDataset', 'RepeatDataset',
     'ClassBalancedDataset', 'DATASETS', 'PIPELINES', 'ImageNet21k', 'SAMPLERS',
-    'build_sampler', 'RepeatAugSampler', 'KFoldDataset', 'CUB', 'CustomDataset'
+    'build_sampler', 'RepeatAugSampler', 'KFoldDataset', 'CUB', 'CustomDataset', 'ImageNette'
 ]
