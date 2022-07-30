@@ -89,6 +89,7 @@ class FeedforwardGateI(BaseModule):
 
         x = self.avg_layer(x)
         x = self.linear_layer(x).squeeze()
+        #x = x[None,:] #only for flops 
         softmax = self.prob_layer(x)
         logprob = self.logprob(x)
 
@@ -193,7 +194,7 @@ class FeedforwardGateII(BaseModule):
         return x, logprob
 
 
-def writeInfos(masks, result_file,  kwargs):
+def writeInfos(masks, result_file):
     f = open(result_file, "a")
     masks = torch.stack(masks).T
     for i, img in enumerate(masks):
@@ -324,7 +325,7 @@ class ResNetFeedForwardSP(BaseBackbone):
                 gprobs.append(gprob)
                 masks.append(mask.squeeze())
 
-        del self.masks[-1]
+        del masks[-1]
 
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
@@ -384,6 +385,7 @@ class RNNGate(BaseModule):
         out, self.hidden = self.rnn(x.view(1, batch_size, -1), self.hidden)
 
         out = out.squeeze()
+        #out = out[None,:] #only for flops
         proj = self.proj(out.view(out.size(0), out.size(1), 1, 1,)).squeeze()
         prob = self.prob(proj)
 
@@ -514,7 +516,7 @@ class RecurrentGatedResNet(BaseBackbone):
                     # not add the last mask to masks
                     gprobs.append(gprob)
                     masks.append(mask.squeeze())
-
+        print(masks)
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
         # x = self.fc(x)

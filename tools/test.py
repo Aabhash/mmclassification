@@ -206,6 +206,9 @@ def main():
                     'To test with CPU, please confirm your mmcv version ' \
                     'is not lower than v1.4.4'
         model.CLASSES = CLASSES
+        #img = torch.ones(1,3,32,32)
+        #flops = FlopCountAnalysis(model.cuda(), (img.cuda(), False))
+        #print(flops.by_module())
         show_kwargs = {} if args.show_options is None else args.show_options
         outputs = single_gpu_test(model, data_loader, args.show, args.show_dir,
                                   **show_kwargs)

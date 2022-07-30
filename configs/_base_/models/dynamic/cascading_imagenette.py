@@ -29,8 +29,7 @@ model = dict(
 
     ),
 
-    pretrained_little = '/home/till/mmclassification/pretrained_models/resnet18_b16x8_cifar10_20210528-bd6371c8.pth',
-    pretrained_big = "/home/till/mmclassification/pretrained_models/resnet50_b16x8_cifar10_20210528-f54bfad9.pth"
+    
 )
 """
     

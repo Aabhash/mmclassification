@@ -9,6 +9,17 @@ from torch.autograd import Variable
 import torch.autograd as autograd
 from ..builder import BACKBONES
 from .base_backbone import BaseBackbone, BaseModule
+def writeInfos(masks, result_file):
+    f = open(result_file, "a")
+    masks = torch.stack(masks).T
+    for i, img in enumerate(masks):
+        closed = 0
+        f.write("img:{} \n".format(i))
+        for gate, opened  in enumerate(img):
+            f.write("gate_no_{} , {} \n".format(gate, opened))
+            closed += 1 if opened == 0 else 0
+        f.write("{} from {} are closed \n".format(closed, len(img)))
+    f.close()
 
 
 class BasicBlock(BaseModule):
@@ -177,13 +188,14 @@ class FeedforwardGateII(BaseModule):
 
         x = self.avg_layer(x)
         x = self.linear_layer(x).squeeze()
+        #x = x[None,:]
         softmax = self.prob_layer(x)
         logprob = self.logprob(x)
 
         # discretize
         x = (softmax[:, 1] > 0.5).float().detach() - \
             softmax[:, 1].detach() + softmax[:, 1]
-
+        #x = x[None, :] #only for flops
         x = x.view(x.size(0), 1, 1, 1)
         return x, logprob
 
@@ -204,8 +216,8 @@ class SoftGateII(BaseModule):
         self.avg_layer = nn.AvgPool2d(pool_size)
         self.linear_layer = nn.Conv2d(in_channels=channel, out_channels=2,
                                       kernel_size=1, stride=1)
-        self.prob_layer = nn.Softmax()
-        self.logprob = nn.LogSoftmax()
+        self.prob_layer = nn.Softmax(dim=1)
+        self.logprob = nn.LogSoftmax(dim=1)
 
     def forward(self, x):
         x = self.conv1(x)
@@ -348,6 +360,8 @@ class ResNetFeedForwardSP_cifar(BaseBackbone):
 
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
+        if result_file:
+            writeInfos(masks, result_file)
         #x = self.fc(x)
         return x 
         return x, masks, gprobs
