@@ -59,7 +59,7 @@ optimizer_config = dict(grad_clip=None)  # Most of the methods do not use gradie
 # Learning rate scheduler config used to register LrUpdater hook
 lr_config = dict(
     policy='CosineAnnealing',
-    min_lr=0,
+    min_lr=0.00001,
     warmup='linear',
     warmup_iters=25025,
     warmup_ratio=0.25)

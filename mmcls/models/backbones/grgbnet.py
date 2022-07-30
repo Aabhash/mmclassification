@@ -60,7 +60,7 @@ class GRGBnet_Base(nn.Module):
             nn.Softmax(dim = 1))
 
 
-    def forward(self, img: Tensor, return_loss: Boolean) -> Tensor:
+    def forward(self, img: Tensor, return_loss: Boolean = False) -> Tensor:
         img = img.to(self.device)
 
         if return_loss:

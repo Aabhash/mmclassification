@@ -4,6 +4,7 @@ model = dict(
         type='GRGBnet_Base',
         use_rgb= True,
         use_grayscale = True,
+        threshhold = 0.9,
     ),
     head=dict(
         type='emptyClsHead',     # linear classification head，

@@ -1,18 +1,15 @@
 # Copyright (c) Carl. All rights reserved.
-from xmlrpc.client import boolean
+from xmlrpc.client import Boolean, boolean
 from torch import Tensor, zeros, ones, device, cuda, logical_and, logical_not
 import torch.nn as nn
 from torch.hub import load_state_dict_from_url
-from torchvision.models.resnet import ResNet, Bottleneck
+# from torchvision.models.resnet import ResNet, Bottleneck
 from torch import load, save, sum, max # WIP: Not needed in final version I guess
 from pathlib import Path
 from collections import OrderedDict
 
 import sys
 import pdb
-
-# sys.path.append('/home/graf-wronski/Projects/dynamic-networks/openmllab/mmclassification_private/mmcls/models/backbones/')
-# sys.path.append('/home/graf-wronski/Projects/dynamic-networks/openmllab/mmclassification_private/mmcls/models/')
 
 from ..builder import BACKBONES
 from .base_backbone import BaseBackbone
@@ -27,7 +24,7 @@ class BranchyNet(nn.Module):
 
     """
 
-    def __init__(self, activated_branches: list):
+    def __init__(self, activated_branches: list, pretrained: Boolean=False):
 
         super(BranchyNet, self).__init__()
 
@@ -35,29 +32,22 @@ class BranchyNet(nn.Module):
         assert(any(activated_branches))
         self.activated_branches = activated_branches.copy()
 
-        self.model = ResNet_CIFAR(depth=50)
-        self.model.fc = nn.Linear(2048, 10, bias=True)
+        self.resnet = ResNet_CIFAR(depth=50)
+        self.fc = nn.Linear(2048, 10, bias=True)
 
+        if pretrained:
         # Load Pretrained Resnet 
+            dirname = Path(__file__).parent.parent.parent.parent
+            resnet_path_backbone = dirname /  'work_dirs/resnet50cifar10_backbone.pth'
+            if not (resnet_path_backbone.is_file()):
+                sys.exit(f"class exitOne requieres pretrained resNet. {resnet_path_backbone} is no file.")
+            
+            state_dict = load(resnet_path_backbone)
+            state_dict = OrderedDict([(k.replace("backbone.", "").replace("head.", ""),v) for k,v in state_dict.items()])
 
-        dirname = Path(__file__).parent.parent.parent.parent
-        resnet_path_backbone = dirname /  'work_dirs/resnet50cifar10_backbone.pth'
+            self.resnet.load_state_dict(state_dict)
 
-        if not (resnet_path_backbone.is_file()):
-            sys.exit(f"class exitOne requieres pretrained resNet. {resnet_path_backbone} is no file.")
-        
-        state_dict = load(resnet_path_backbone)
-        state_dict = OrderedDict([(k.replace("backbone.", "").replace("head.", ""),v) for k,v in state_dict.items()])
-
-        self.model.load_state_dict(state_dict)
-        # save(self.model.state_dict(), resnet_path_backbone)
-
-        self.layer1 = nn.Sequential(
-            self.model.conv1,
-            self.model.bn1,
-            self.model.relu,
-            self.model.layer1
-        )
+        # self.layer1 = self.resnet.layer1
 
         self.earlyExit1 = nn.Sequential(
             nn.Conv2d(256, 512, 5, 3),
@@ -71,13 +61,13 @@ class BranchyNet(nn.Module):
             nn.ReLU(),
             nn.AvgPool2d(3, stride=2, padding=1),
             nn.Flatten(),
-            self.model.fc,
+            self.fc,
             nn.Softmax(dim=1)
         )
 
-        self.layer2 = self.model.layer2
+        self.layer2 = self.resnet.layer2
 
-        self.layer3 = self.model.layer3
+        self.layer3 = self.resnet.layer3
 
         self.earlyExit2 = nn.Sequential(
             nn.Conv2d(1024, 2048, 3, 2),
@@ -86,20 +76,28 @@ class BranchyNet(nn.Module):
             nn.AvgPool2d(3, stride=2, padding=1),
             nn.Flatten(),
             nn.Linear(8192, 2048),
-            self.model.fc,
+            self.fc,
             nn.Softmax(dim=1)
         )
 
-        self.layer4 = nn.Sequential(
-            self.model.layer4,
-            nn.AvgPool2d(3, stride=2, padding=1),
-            nn.Flatten(),
-            nn.Linear(8192, 2048),
-            self.model.fc,
-            nn.Softmax(dim=1)
+        self.layer4 = self.resnet.layer4
+
+        self.layer4_head = nn.Sequential(    
+           nn.AvgPool2d(3, stride=2, padding=1),
+           nn.Flatten(),
+           nn.Linear(8192, 2048),
+           self.fc,
+           nn.Softmax(dim=1)
         )
 
-    def forward(self, img, return_loss):
+        # self.head_1 = nn.AvgPool2d(3, stride=2, padding=1)
+        # self.head_2 = nn.Flatten()
+        # self.head_3 = nn.Linear(8192, 2048)
+        # self.head_4 = self.resnet.fc
+        # self.head_5 = nn.Softmax(dim=1)
+
+
+    def forward(self, img, return_loss=False):
         if cuda.is_available():
             img = img.to(device='cuda')
 
@@ -109,12 +107,14 @@ class BranchyNet(nn.Module):
             return self.forward_test(img)
 
     def forward_train(self, x: Tensor) -> Tensor:
-        x = self.layer1(x)
+        # x = self.preprocess(x)
+        x = self.resnet.layer1(x)
         y1 = self.earlyExit1(x)
         x = self.layer2(x)
         x = self.layer3(x)
         y2 = self.earlyExit2(x)
-        y3 = self.layer4(x)
+        x = self.layer4(x)
+        y3 = self.layer4_head(x)
 
         return [y1, y2, y3]
 
@@ -131,10 +131,8 @@ class BranchyNet(nn.Module):
             y = y.to(device='cuda')
             Mask_Pass_On.to(device='cuda')
 
-        x = self.layer1(x)
-
-        # 1 2 3 4 5 6 7 
-
+        x = self.resnet.layer1(x)
+        
         if self.activated_branches[0]:
             y_exitOne = self.earlyExit1(x)
             
@@ -143,14 +141,12 @@ class BranchyNet(nn.Module):
             
             # If there are further exits we have to sort the bad results out
             if any(self.activated_branches[1:-1]):
-                # pdb.set_trace()
                 y_exitOne = y_exitOne * Mask_exitOne
             y += y_exitOne    
 
             # Invert the mask and reshape it
             Mask_Pass_On = (Mask_exitOne < .5).reshape(-1)
 
-            # 1 4 6 7 
 
         if any(self.activated_branches[1:]):
             x = mask_down(x, Mask_Pass_On)
@@ -164,7 +160,6 @@ class BranchyNet(nn.Module):
                 y_exitTwo = mask_up(y_exitTwo, Mask_Pass_On)
                 x = mask_up(x, Mask_Pass_On)
                 
-                # 1 - - 4 - 6 7
 
                 Mask_exitTwo = max(y_exitTwo, axis=1)[0] >= 0.65
                 Mask_exitTwo = Mask_exitTwo.reshape(-1, 1)
@@ -172,20 +167,20 @@ class BranchyNet(nn.Module):
                 # If there are further exits we have to sort the bad results out
                 if (self.activated_branches[-1]):
                     y_exitTwo = (y_exitTwo * Mask_exitTwo)
-                    # x = mask_up(x, Mask_exitTwo)
+                
                     if cuda.is_available():
                         y_exitTwo = y_exitTwo.to(device='cuda')
-                    # print(y.get_device(), y_exitTwo.get_device())
+                
                 y += y_exitTwo    
                 
                 Mask_Pass_On = logical_not(Mask_exitTwo).reshape(-1)
 
                 x = mask_down(x, Mask_Pass_On)
-                # Mask_Pass_On -= mask_up(Mask_exitTwo, Mask_Pass_On).reshape(-1)
 
             if self.activated_branches[-1]:
                 x = self.layer4(x)
-                
+                x = self.layer4_head(x)
+
                 y_full_path = mask_up(x, Mask_Pass_On)
                 
                 y += y_full_path
@@ -212,7 +207,6 @@ class BranchyNetImagenette(nn.Module):
         self.pretrained = pretrained
 
         self.model = ResNet_CIFAR(depth=50)
-        # self.model.fc = nn.Linear(2048, 10, bias=True)
 
         # Load Pretrained Resnet 
         if self.pretrained:
@@ -333,8 +327,6 @@ class BranchyNetImagenette(nn.Module):
             # Invert the mask and reshape it
             Mask_Pass_On = (Mask_exitOne < .5).reshape(-1)
 
-            # 1 4 6 7 
-
         if any(self.activated_branches[1:]):
             x = mask_down(x, Mask_Pass_On)       
             x = self.layer2(x)
@@ -343,8 +335,6 @@ class BranchyNetImagenette(nn.Module):
                 y_exitTwo = self.earlyExit2(x)
                 y_exitTwo = mask_up(y_exitTwo, Mask_Pass_On)
                 x = mask_up(x, Mask_Pass_On)
-                
-                # 1 - - 4 - 6 7
 
                 Mask_exitTwo = max(y_exitTwo, axis=1)[0] >= 0.65
                 Mask_exitTwo = Mask_exitTwo.reshape(-1, 1)
@@ -372,35 +362,6 @@ class BranchyNetImagenette(nn.Module):
                 y += y_full_path
 
         return y
-
-
-# def mask_down(t: Tensor, mask: Tensor) -> Tensor:
-#     mask = mask.reshape(-1)
-
-#     if cuda.is_available(): 
-#         return t[mask.bool()].to(device='cuda')
-
-#     return t[mask.bool()]
-
-# def mask_up(t: Tensor, mask: Tensor) -> Tensor:
-#     '''This method takes a downsized vector and upsizes it again, so that the new tensor
-#         has its values where the mask has its Ones.'''
-
-#     mask_as_list = list(mask)
-#     BS =  len(mask_as_list)
-#     # BS, C, H, W = len(mask_as_list), *(list(t.size())[1: ])
-#     small_batch_size = t.size()[0]
-#     # output = zeros(BS, C, H, W)
-#     output = zeros(BS, *(list(t.size())[1: ]))
-
-#     i = 0
-#     for j in range(BS):
-#         if mask_as_list[j]:
-#             output[j, :] = t[i, :]
-#             i += 1
-#     if cuda.is_available():
-#         return output.to(device='cuda')
-#     return output
 
 @BACKBONES.register_module()
 class BranchyNetImagenette2(nn.Module):
@@ -512,7 +473,7 @@ class BranchyNetImagenette2(nn.Module):
             nn.Softmax(dim=1)
         ).to(self.device)
 
-    def forward(self, img, return_loss):
+    def forward(self, img, return_loss=True):
         
         img = img.to(self.device)
 
@@ -544,8 +505,6 @@ class BranchyNetImagenette2(nn.Module):
 
         x = self.layer1(x)
 
-        # 1 2 3 4 5 6 7 
-
         if self.activated_branches[0]:
             y_exitOne = self.earlyExit1(x)
             
@@ -561,8 +520,6 @@ class BranchyNetImagenette2(nn.Module):
             # Invert the mask and reshape it
             Mask_Pass_On = (Mask_exitOne < .5).to(self.device)
 
-            # 1 4 6 7 
-
         if any(self.activated_branches[1:]):
             x = mask_down(x, Mask_Pass_On).to(self.device)       
             x = self.layer2(x)
@@ -571,8 +528,6 @@ class BranchyNetImagenette2(nn.Module):
                 y_exitTwo = self.earlyExit2(x)
                 y_exitTwo = mask_up(y_exitTwo, Mask_Pass_On).to(self.device)
                 x = mask_up(x, Mask_Pass_On).to(self.device)
-                
-                # 1 - - 4 - 6 7
 
                 Mask_exitTwo = max(y_exitTwo, axis=1)[0] >= self.th_Two
                 Mask_exitTwo = Mask_exitTwo.to(self.device)
@@ -580,15 +535,12 @@ class BranchyNetImagenette2(nn.Module):
                 # If there are further exits we have to sort the bad results out
                 if (self.activated_branches[-1]):
                     y_exitTwo = (Mask_exitTwo.reshape(-1,1)*y_exitTwo)
-                    # x = mask_up(x, Mask_exitTwo)
                     y_exitTwo = y_exitTwo.to(self.device)
-                    # print(y.get_device(), y_exitTwo.get_device())
                 y += y_exitTwo    
                 
                 Mask_Pass_On = logical_not(Mask_exitTwo).to(self.device)
 
                 x = mask_down(x, Mask_Pass_On).to(self.device)
-                # Mask_Pass_On -= mask_up(Mask_exitTwo, Mask_Pass_On).reshape(-1)
 
             if self.activated_branches[-1]:
                 x = self.layer3(x)
