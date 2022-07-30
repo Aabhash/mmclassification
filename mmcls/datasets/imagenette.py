@@ -7,7 +7,6 @@ from .custom import CustomDataset
 
 @DATASETS.register_module()
 class ImageNette(CustomDataset):
-<<<<<<< HEAD
     """`ImageNet <http://www.image-net.org>`_ Dataset.
 
     The dataset supports two kinds of annotation format. More details can be
@@ -38,10 +37,6 @@ class ImageNette(CustomDataset):
             If None, automatically inference from the specified path.
             Defaults to None.
     """  # noqa: E501
-=======
-    """ Copied from Tills Branch"""
-      # noqa: E501
->>>>>>> intermediate-classifiers
 
     IMG_EXTENSIONS = ('.jpg', '.jpeg', '.png', '.ppm', '.bmp', '.pgm', '.tif')
     CLASSES = [
