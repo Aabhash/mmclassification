@@ -21,7 +21,8 @@ model = dict(
         # num_classes=10,
         # in_channels=1280,
         loss=dict(type='CrossEntropyLoss', loss_weight=1.0),
-        topk=(1, )
+        topk=(1, ),
+        num_exits = 6
     ),
     pretrained=None
 )
