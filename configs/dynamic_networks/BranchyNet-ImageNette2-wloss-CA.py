@@ -2,12 +2,13 @@ model = dict(
     type='EarlyExitClassifier',
     backbone=dict(
         type='BranchyNetImagenette2',
-        activated_branches=[True, True, True], pretrained=False, exit_treshholds=[0.8, 0.7]),
+        activated_branches=[True, True, True], pretrained=False, exit_treshholds=[0.8, 0.7],
+        log_file = "/results/BrachyNet-Imagenette2/log1.txt"),
     head=dict(
         type='emptyClsHead',     # linear classification head，
         loss=dict(type='WeightedBranchyNetLoss',
-                  weights=[0.6, 1.8, 0.6]), # Loss function configuration information
-        topk=(1, 3),              # Evaluation index, Top-k accuracy rate, here is the accuracy rate of top1 and top5
+                  weights=[0.6, 1.8, 0.6],), # Loss function configuration information
+        topk=(1, 3),              # Evaluation index, Top-k accuracy rate, here is the accuracy rate of top1 and top3
     )
     
 )

@@ -7,6 +7,8 @@ from torch.hub import load_state_dict_from_url
 from torch import load, save, sum, max # WIP: Not needed in final version I guess
 from pathlib import Path
 from collections import OrderedDict
+from ast import Str
+
 
 import sys
 import pdb
@@ -24,7 +26,7 @@ class BranchyNet(nn.Module):
 
     """
 
-    def __init__(self, activated_branches: list, pretrained: Boolean=False):
+    def __init__(self, activated_branches: list =[True, True, True], pretrained: Boolean=False, log_file: Str=None):
 
         super(BranchyNet, self).__init__()
 
@@ -34,6 +36,7 @@ class BranchyNet(nn.Module):
 
         self.resnet = ResNet_CIFAR(depth=50)
         self.fc = nn.Linear(2048, 10, bias=True)
+        self.log_file = log_file
 
         if pretrained:
         # Load Pretrained Resnet 
@@ -122,9 +125,6 @@ class BranchyNet(nn.Module):
         return forward_test(self, x)
     
     def forward_test(self, x: Tensor)-> Tensor:
-        
-        
-
         bs = x.size()[0]
         y = zeros(bs, 10)
         Mask_Pass_On = ones(bs).bool()
@@ -150,6 +150,12 @@ class BranchyNet(nn.Module):
             # Invert the mask and reshape it
             Mask_Pass_On = (Mask_exitOne < .5).reshape(-1)
 
+            if self.log_file:
+                    # Here the logging of the Exits of different Images takes Place
+                    # Assuming that the image names are written elsewhere in the training loop
+                    file_object = open(self.log_file, 'a')
+                    file_object.write(str(Mask_exitOne))
+                    file_object.close() 
 
         if any(self.activated_branches[1:]):
             x = mask_down(x, Mask_Pass_On)
@@ -166,6 +172,13 @@ class BranchyNet(nn.Module):
                 Mask_exitTwo = max(y_exitTwo, axis=1)[0] >= 0.65
                 Mask_exitTwo = Mask_exitTwo.reshape(-1, 1)
                 
+                if self.log_file:
+                    # Here the logging of the Exits of different Images takes Place
+                    # Assuming that the image names are written elsewhere in the training loop
+                    file_object = open(self.log_file, 'a')
+                    file_object.write(str(Mask_exitTwo))
+                    file_object.close() 
+
                 # If there are further exits we have to sort the bad results out
                 if (self.activated_branches[-1]):
                     y_exitTwo = (y_exitTwo * Mask_exitTwo)
@@ -180,6 +193,13 @@ class BranchyNet(nn.Module):
                 x = mask_down(x, Mask_Pass_On)
 
             if self.activated_branches[-1]:
+                if self.log_file:
+                    # Here the logging of the Exits of different Images takes Place
+                    # Assuming that the image names are written elsewhere in the training loop
+                    file_object = open(self.log_file, 'a')
+                    file_object.write(str(Mask_Pass_On))
+                    file_object.close() 
+
                 x = self.layer4(x)
                 x = self.layer4_head(x)
 
@@ -189,190 +209,10 @@ class BranchyNet(nn.Module):
 
         return y
 
-
-@BACKBONES.register_module()
-class BranchyNetImagenette(nn.Module):
-    
-    """ The BaseBlock of my BranchyNet Version. 
-        It contains the first layer and the first exit.
-        It also keeps hold of the whole loaded ResNet.
-
-    """
-
-    def __init__(self, activated_branches: list, pretrained: boolean=False):
-
-        super(BranchyNetImagenette, self).__init__()
-
-        # The variable activated branches stores which Branches to use during Test Phase
-        assert(any(activated_branches))
-        self.activated_branches = activated_branches.copy()
-        self.pretrained = pretrained
-
-        self.model = ResNet_CIFAR(depth=50)
-
-        # Load Pretrained Resnet 
-        if self.pretrained:
-            dirname = Path(__file__).parent.parent.parent.parent
-            resnet_path_backbone = dirname /  'work_dirs/resnet50cifar10_backbone.pth'
-
-            if not (resnet_path_backbone.is_file()):
-                sys.exit(f"class exitOne requieres pretrained resNet. {resnet_path_backbone} is no file.")
-            
-            state_dict = load(resnet_path_backbone)
-            state_dict = OrderedDict([(k.replace("backbone.", "").replace("head.", ""),v) for k,v in state_dict.items()])
-
-            self.model.load_state_dict(state_dict)
-            # save(self.model.state_dict(), resnet_path_backbone)
-
-        self.layer1 = nn.Sequential(
-            self.model.conv1,
-            self.model.bn1,
-            self.model.relu,
-            self.model.layer1,
-            nn.Conv2d(256, 256, 5, 3),
-            nn.BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
-            nn.ReLU(),
-
-        )
-
-        self.earlyExit1 = nn.Sequential(
-            nn.Conv2d(256, 512, 5, 3),
-            nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
-            nn.ReLU(),
-            nn.AvgPool2d(5, stride=3, padding=0),
-            nn.Conv2d(512, 1024, 3, 2),
-            nn.BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
-            nn.ReLU(),
-            nn.AvgPool2d(3, stride=2, padding=1),
-            nn.Flatten(),
-            nn.Linear(4096, 10),
-            nn.Softmax(dim=1),
-        )
-
-        self.layer2 = self.model.layer2
-
-        self.earlyExit2 = nn.Sequential(
-            nn.Conv2d(512, 512, 3, 3),
-            nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
-            nn.ReLU(), 
-            nn.Conv2d(512, 1024, 3, 2),
-            nn.BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
-            nn.ReLU(),
-            nn.AvgPool2d(3, stride=2, padding=0),
-            nn.Flatten(),
-            nn.Linear(4096, 10),
-            nn.Softmax(dim=1),
-        )
-
-        self.layer3 = self.model.layer3
-
-        self.layer4 = nn.Sequential(
-            self.model.layer4,
-            nn.Conv2d(2048, 1024, 3, 2, padding=0),
-            nn.BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
-            nn.ReLU(),
-            nn.AvgPool2d(2, stride=2, padding=0),
-            nn.Flatten(),
-            nn.Linear(4096, 10),
-            nn.Softmax(dim=1)
-        )
-
-    def forward(self, img, return_loss=False):
-        if cuda.is_available():
-            img = img.to(device='cuda')
-
-        if return_loss:
-            return self.forward_train(img)
-        else:
-            return self.forward_test(img)
-
-    def forward_train(self, x: Tensor) -> Tensor:
-        x = self.layer1(x)
-        y1 = self.earlyExit1(x)
-        x = self.layer2(x)
-        y2 = self.earlyExit2(x)
-        x = self.layer3(x)
-        y3 = self.layer4(x)
-
-        return [y1, y2, y3]
-
-    def simple_test(self, x: Tensor) -> Tensor:
-        return forward_test(self, x)
-    
-    def forward_test(self, x: Tensor)-> Tensor:
-
-        bs = x.size()[0]
-        y = zeros(bs, 10)
-        Mask_Pass_On = ones(bs).bool()
-
-        if cuda.is_available():
-            y = y.to(device='cuda')
-            Mask_Pass_On.to(device='cuda')
-
-        x = self.layer1(x)
-
-        # 1 2 3 4 5 6 7 
-
-        if self.activated_branches[0]:
-            pdb.set_trace()
-            y_exitOne = self.earlyExit1(x)
-            
-            Mask_exitOne = max(y_exitOne, axis=1)[0] >= 0.65
-            Mask_exitOne = Mask_exitOne.reshape(-1, 1)
-            
-            # If there are further exits we have to sort the bad results out
-            if any(self.activated_branches[1:-1]):
-                # pdb.set_trace()
-                y_exitOne = y_exitOne * Mask_exitOne
-            y += y_exitOne    
-
-            # Invert the mask and reshape it
-            Mask_Pass_On = (Mask_exitOne < .5).reshape(-1)
-
-        if any(self.activated_branches[1:]):
-            x = mask_down(x, Mask_Pass_On)       
-            x = self.layer2(x)
-            if self.activated_branches[1]:
-                pdb.set_trace()
-                y_exitTwo = self.earlyExit2(x)
-                y_exitTwo = mask_up(y_exitTwo, Mask_Pass_On)
-                x = mask_up(x, Mask_Pass_On)
-
-                Mask_exitTwo = max(y_exitTwo, axis=1)[0] >= 0.65
-                Mask_exitTwo = Mask_exitTwo.reshape(-1, 1)
-                
-                # If there are further exits we have to sort the bad results out
-                if (self.activated_branches[-1]):
-                    y_exitTwo = (y_exitTwo * Mask_exitTwo)
-                    # x = mask_up(x, Mask_exitTwo)
-                    if cuda.is_available():
-                        y_exitTwo = y_exitTwo.to(device='cuda')
-                    # print(y.get_device(), y_exitTwo.get_device())
-                y += y_exitTwo    
-                
-                Mask_Pass_On = logical_not(Mask_exitTwo).reshape(-1)
-
-                x = mask_down(x, Mask_Pass_On)
-                # Mask_Pass_On -= mask_up(Mask_exitTwo, Mask_Pass_On).reshape(-1)
-
-            if self.activated_branches[-1]:
-                x = self.layer3(x)
-                x = self.layer4(x)
-                
-                y_full_path = mask_up(x, Mask_Pass_On)
-                
-                y += y_full_path
-
-        return y
-
 @BACKBONES.register_module()
 class BranchyNetImagenette2(nn.Module):
     
-    """ The BaseBlock of my BranchyNet Version. 
-        It contains the first layer and the first exit.
-        It also keeps hold of the whole loaded ResNet.
-
-    """
+    """ Improved BranchyNet-Imagenette Version. """
 
     def __init__(self, activated_branches: list, pretrained: boolean=False,
                        exit_treshholds: list=[0.6, 0.6]):
