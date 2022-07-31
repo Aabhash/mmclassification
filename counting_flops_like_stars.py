@@ -5,11 +5,16 @@ from sklearn.ensemble import GradientBoostingClassifier
 from mmcls.models.backbones.earlyexit import BranchyNetImagenette2, BranchyNet
 from tools.analysis_tools.flop_counter import *
 from mmcls.models.backbones.grgbnet import GRGBnet_Base
-from torch import rand
+from torch import rand, cuda
 
 from fvcore.nn import FlopCountAnalysis
 
 # Building Models and setting Input variables
+
+if cuda.is_available()
+    device = 'cuda'
+else:
+    device = 'cpu'
 
 BNCF = BranchyNet(activated_branches=[True, True, True])
 BNI = BranchyNetImagenette2(activated_branches=[True, True, True])
@@ -18,14 +23,20 @@ GRGB_RGB = GRGBnet_Base(use_grayscale=False, use_rgb=True)
 GRGB_G = GRGBnet_Base(use_grayscale=True, use_rgb=False)
 GRGB = GRGBnet_Base(use_grayscale=True, use_rgb=True)
 
+model_list =[BNCF, BNI, GRGB_RGB, GRGB_G, GRGB]
+
+for m in model_list:
+    m = m.to(device)
+
+
 H_Imagenette = 224
 W_Imagenette = 224
 
 H_Cifar = 32
 W_Cifar = 32
 
-random_Imagenette = rand(1, 3, H_Imagenette, W_Imagenette)
-random_Cifar = rand(1, 3, H_Cifar, W_Cifar)
+random_Imagenette = rand(1, 3, H_Imagenette, W_Imagenette).to(device)
+random_Cifar = rand(1, 3, H_Cifar, W_Cifar).to(device)
 
 # ------------------- TESTING -------------------
 # flop_counter.py 
