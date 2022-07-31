@@ -12,7 +12,7 @@ import torch.distributed as dist
 from mmcv.image import tensor2imgs
 from mmcv.runner import get_dist_info
 
-log_file = "/results/BrachyNet-Imagenette2/log1.txt"
+log_file = "/results/BranchyNet-Imagenette2/log1.txt"
 
 def single_gpu_test(model,
                     data_loader,
