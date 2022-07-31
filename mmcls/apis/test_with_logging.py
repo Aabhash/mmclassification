@@ -18,6 +18,7 @@ def single_gpu_test(model,
                     data_loader,
                     show=False,
                     out_dir=None,
+                    log_file=log_file,
                     **show_kwargs):
     """Test model with local single gpu.
 
