@@ -12,13 +12,12 @@ import torch.distributed as dist
 from mmcv.image import tensor2imgs
 from mmcv.runner import get_dist_info
 
-test = "/home/graf-wronski/Projects/dynamic-networks/openmllab/mmclassification/testfile.txt"
+log_file = "/results/BrachyNet-Imagenette2/log1.txt"
 
 def single_gpu_test(model,
                     data_loader,
                     show=False,
                     out_dir=None,
-                    log_file=test,
                     **show_kwargs):
     """Test model with local single gpu.
 
@@ -41,7 +40,7 @@ def single_gpu_test(model,
     prog_bar = mmcv.ProgressBar(len(dataset))
     for i, data in enumerate(data_loader):
         with torch.no_grad():
-            result = model(return_loss=False, log_file=log_file **data)
+            result = model(return_loss=False, **data)
 
         batch_size = len(result)
         results.extend(result)
