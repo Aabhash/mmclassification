@@ -19,11 +19,16 @@ else:
 BNCF = BranchyNet(activated_branches=[True, True, True])
 BNI = BranchyNetImagenette2(activated_branches=[True, True, True])
 
+BNI_list = [BNI]
+BNCF_list = [BNCF]
+
 GRGB_RGB = GRGBnet_Base(use_grayscale=False, use_rgb=True)
 GRGB_G = GRGBnet_Base(use_grayscale=True, use_rgb=False)
 GRGB = GRGBnet_Base(use_grayscale=True, use_rgb=True)
 
-model_list =[BNCF, BNI, GRGB_RGB, GRGB_G, GRGB]
+GRGB_list = [GRGB_G, GRGB_RGB, GRGB]
+
+model_list = BNI_list + BNCF_list + GRGB_list
 
 for m in model_list:
     m = m.to(device)
@@ -35,8 +40,11 @@ W_Imagenette = 224
 H_Cifar = 32
 W_Cifar = 32
 
-random_Imagenette = rand(7, 3, H_Imagenette, W_Imagenette).to(device)
+random_Imagenette = rand(1, 3, H_Imagenette, W_Imagenette).to(device)
+random_Imagenette_batch = rand(16, 3, H_Imagenette, W_Imagenette).to(device)
+
 random_Cifar = rand(1, 3, H_Cifar, W_Cifar).to(device)
+random_Cifar_batch = rand(16, 3, H_Cifar, W_Cifar).to(device)
 
 # ------------------- TESTING -------------------
 # flop_counter.py 
@@ -79,13 +87,19 @@ print("")
 print(" _______________________________________ \n")
 print("Flop Count Analysis with FlopCountAnalysis")
 print("BranchyNet-Net")
-print("Using Random Tensor")
+print("Using Random Tensor Batch")
 print("Imagenette")
 
-flops = FlopCountAnalysis(BNI, random_Imagenette)
+flops = FlopCountAnalysis(BNI, random_Imagenette_batch)
 print(f"\n Total Flops: ", flops.total())
 print(f"\n Flops by Operator:", flops.by_operator())
 
-# print(f"\n flops.by Module:", flops.by_module())
+print(" _______________________________________ \n")
+print("Flop Count Analysis with FlopCountAnalysis")
+print("BranchyNet-Net")
+print("Using Random Tensor Batch")
+print("Cifar-10")
 
-# measure_model(BNCF, H_Cifar, W_Cifar)
+flops = FlopCountAnalysis(BNCF, random_Cifar_batch)
+print(f"\n Total Flops: ", flops.total())
+print(f"\n Flops by Operator:", flops.by_operator())
