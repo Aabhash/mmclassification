@@ -127,7 +127,7 @@ venv.bak/
 /results/Final-Networks-Carl
 
 # Pytorch
-# *.pth
+*.pth
 
 # IPU
 *.pvti
