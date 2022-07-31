@@ -12,13 +12,10 @@ import torch.distributed as dist
 from mmcv.image import tensor2imgs
 from mmcv.runner import get_dist_info
 
-log_file = "results/BranchyNet-Imagenette2/log1.txt"
-
 def single_gpu_test(model,
                     data_loader,
                     show=False,
                     out_dir=None,
-                    log_file=log_file,
                     **show_kwargs):
     """Test model with local single gpu.
 
@@ -35,6 +32,7 @@ def single_gpu_test(model,
     Returns:
         list: The prediction results.
     """
+    log = "results/BranchyNet-Imagenette/log1.txt"
     model.eval()
     results = []
     dataset = data_loader.dataset
@@ -46,7 +44,7 @@ def single_gpu_test(model,
         batch_size = len(result)
         results.extend(result)
 
-        if show or out_dir:
+        if True:
             result = [r.to('cpu') for r in result]
             scores = np.vstack(result)
             pred_score = np.max(scores, axis=1)
@@ -57,15 +55,15 @@ def single_gpu_test(model,
             imgs = tensor2imgs(data['img'], **img_metas[0]['img_norm_cfg'])
             assert len(imgs) == len(img_metas)
 
-            if log_file:
-                log_file = open(log_file, 'a')
+            if log:
+                log_file = open(log, 'a')
 
             for i, (img, img_meta) in enumerate(zip(imgs, img_metas)):
                 h, w, _ = img_meta['img_shape']
                 img_show = img[:h, :w, :]
 
-                if log_file:
-                    log_file.write(img_meta['ori_filename'] & "\n")
+                if log:
+                    log_file.write(img_meta['ori_filename'] + "\n")
                 
 
                 ori_h, ori_w = img_meta['ori_shape'][:-1]
@@ -88,7 +86,7 @@ def single_gpu_test(model,
                     out_file=out_file,
                     **show_kwargs)
 
-            if log_file:
+            if log:
              log_file.close() 
         batch_size = data['img'].size(0)
         for _ in range(batch_size):

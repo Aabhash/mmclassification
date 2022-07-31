@@ -42,7 +42,7 @@ from .skipnet import ResNetFeedForwardSP
 from .skipnet_cifar import ResNetFeedForwardSP_cifar
 from .skipnet import RecurrentGatedResNet
 from .dn_cgnet import CGResNet
-from .earlyexit import BranchyNet, BranchyNetImagenette, BranchyNetImagenette2
+from .earlyexit import BranchyNet, BranchyNetImagenette2
 from .grgbnet import GRGBnet_Base
 
 
@@ -56,5 +56,5 @@ __all__ = [
     'CSPDarkNet', 'CSPResNet', 'CSPResNeXt', 'CSPNet', 'RepMLPNet',
     'PoolFormer', 'DenseNet', 'VAN', 'ResNetFeedForwardSP', 'ResNetFeedForwardSP_cifar',
     'RecurrentGatedResNet', 'CGResNet', 'MultiScaleNet', 'MultiScaleNetCifar',
-    'BranchyNet', 'BranchyNetImagenette', 'BranchyNetImagenette2', 'GRGBnet_Base', 'CResNet', 'CResNet_CIFAR'
+    'BranchyNet', 'BranchyNetImagenette2', 'GRGBnet_Base', 'CResNet', 'CResNet_CIFAR'
 ]
