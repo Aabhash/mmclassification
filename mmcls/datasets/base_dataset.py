@@ -157,7 +157,7 @@ class BaseDataset(Dataset, metaclass=ABCMeta):
         ]
         # pdb.set_trace()
         eval_results = {}
-        results = [r.cpu() for r in results]
+        # results = [r.cpu() for r in results]
         results = np.vstack(results)
         gt_labels = self.get_gt_labels()
         if indices is not None:
