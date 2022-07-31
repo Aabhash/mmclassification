@@ -20,7 +20,9 @@ from .repvgg import RepVGG
 from .res2net import Res2Net
 from .resnest import ResNeSt
 from .resnet import ResNet, ResNetV1c, ResNetV1d
+from .custom_resnet import CResNet
 from .resnet_cifar import ResNet_CIFAR
+from .custom_resnet_cifar import CResNet_CIFAR
 from .resnext import ResNeXt
 from .seresnet import SEResNet
 from .seresnext import SEResNeXt
@@ -54,5 +56,5 @@ __all__ = [
     'CSPDarkNet', 'CSPResNet', 'CSPResNeXt', 'CSPNet', 'RepMLPNet',
     'PoolFormer', 'DenseNet', 'VAN', 'ResNetFeedForwardSP', 'ResNetFeedForwardSP_cifar',
     'RecurrentGatedResNet', 'CGResNet', 'MultiScaleNet', 'MultiScaleNetCifar',
-    'BranchyNet', 'BranchyNetImagenette', 'BranchyNetImagenette2', 'GRGBnet_Base'
+    'BranchyNet', 'BranchyNetImagenette', 'BranchyNetImagenette2', 'GRGBnet_Base', 'CResNet', 'CResNet_CIFAR'
 ]

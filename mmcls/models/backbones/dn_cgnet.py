@@ -1,8 +1,9 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from .resnet_cifar import ResNet_CIFAR
+from .custom_resnet_cifar import CResNet_CIFAR
 from ..builder import BACKBONES
+import json
 
 
 class CGConv2d(nn.Conv2d):
@@ -50,11 +51,19 @@ class CGConv2d(nn.Conv2d):
 
         self.count_exit = 0
         self.count_all = 0
+        self.sparsity_tracker = {}
 
     def gt(self, input):
         return torch.Tensor.float(torch.gt(input, torch.zeros_like(input)))
 
-    def forward(self, input):
+    def write_infos(self, result_file):
+        with open(result_file, "w+") as f:
+            json.dump(self.sparsity_tracker, f)     
+
+    def forward(self, input, **kwargs):
+        
+        result_file = kwargs.get("result_file")
+
         Yp = F.conv2d(input, self.weight * self.mask, self.bias,
                       self.stride, self.padding, self.dilation, self.groups)
 
@@ -67,11 +76,29 @@ class CGConv2d(nn.Conv2d):
         self.count_all = d.numel()
         self.count_exit = d[d > 0].numel()
 
+        if result_file:
+            metas = kwargs.get("metas")
+            for i, m in enumerate(metas):
+                curr = d[i]
+                curr_all = curr.numel()
+                curr_exited = curr[curr > 0].numel()
+                self.sparsity_tracker[m['ori_filename']] = (round((curr_exited / curr_all), 4), curr_exited, curr_all)
+            self.write_infos(result_file)
         return Y * d + Yp * (torch.ones_like(d) - d)
 
 
+# class CGResLayer(ResLayer):
+#     def __init__(self):
+#         super().__init__()
+
+#     def forward(self, input):
+#         for module in self:
+#             input = module(input)
+#         return input
+
+
 @BACKBONES.register_module()
-class CGResNet(ResNet_CIFAR):
+class CGResNet(CResNet_CIFAR):
     def __init__(
             self, depth, num_blocks, in_channels=3, base_channels=16, gtarget=1.0, strides=(1, 2, 2), **kwargs):
         super(CGResNet, self).__init__(
@@ -110,11 +137,11 @@ class CGResNet(ResNet_CIFAR):
                 )
                 self.in_planes = pl * self.block_expansion
 
-    def forward(self, x):
+    def forward(self, x, **kwargs):
         out = self.relu(self.bn1(self.conv1(x)))
-        out = self.layer1(out)
-        out = self.layer2(out)
-        out = self.layer3(out)
+        out = self.layer1(out, **kwargs)
+        out = self.layer2(out, **kwargs)
+        out = self.layer3(out, **kwargs)
         out = F.avg_pool2d(out, out.size()[3])
         out = out.view(out.size(0), -1)
         return out
