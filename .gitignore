@@ -124,6 +124,7 @@ venv.bak/
 /work_dir
 /mmcls/.mim
 .DS_Store
+/results/Final-Networks-Carl
 
 # Pytorch
 # *.pth

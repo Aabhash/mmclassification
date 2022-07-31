@@ -503,6 +503,8 @@ class BranchyNetImagenette2(nn.Module):
         Mask_Pass_On = ones(bs).bool()
         Mask_Pass_On.to(self.device)
 
+        pdb.set_trace()
+
         x = self.layer1(x)
 
         if self.activated_branches[0]:

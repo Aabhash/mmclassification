@@ -11,7 +11,7 @@ from fvcore.nn import FlopCountAnalysis
 
 # Building Models and setting Input variables
 
-if cuda.is_available()
+if cuda.is_available():
     device = 'cuda'
 else:
     device = 'cpu'
@@ -35,7 +35,7 @@ W_Imagenette = 224
 H_Cifar = 32
 W_Cifar = 32
 
-random_Imagenette = rand(1, 3, H_Imagenette, W_Imagenette).to(device)
+random_Imagenette = rand(7, 3, H_Imagenette, W_Imagenette).to(device)
 random_Cifar = rand(1, 3, H_Cifar, W_Cifar).to(device)
 
 # ------------------- TESTING -------------------
