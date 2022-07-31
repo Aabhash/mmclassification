@@ -46,6 +46,7 @@ def single_gpu_test(model,
         results.extend(result)
 
         if show or out_dir:
+            result = [r.to('cpu') for r in result]
             scores = np.vstack(result)
             pred_score = np.max(scores, axis=1)
             pred_label = np.argmax(scores, axis=1)
