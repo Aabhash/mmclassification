@@ -47,7 +47,13 @@ class BranchyNet(nn.Module):
 
             self.resnet.load_state_dict(state_dict)
 
-        # self.layer1 = self.resnet.layer1
+        self.preprocessing = nn.Sequential(
+            self.resnet.conv1,
+            self.resnet.bn1,
+            self.resnet.relu,
+        )
+
+        self.layer1 = self.resnet.layer1
 
         self.earlyExit1 = nn.Sequential(
             nn.Conv2d(256, 512, 5, 3),
@@ -90,12 +96,6 @@ class BranchyNet(nn.Module):
            nn.Softmax(dim=1)
         )
 
-        # self.head_1 = nn.AvgPool2d(3, stride=2, padding=1)
-        # self.head_2 = nn.Flatten()
-        # self.head_3 = nn.Linear(8192, 2048)
-        # self.head_4 = self.resnet.fc
-        # self.head_5 = nn.Softmax(dim=1)
-
 
     def forward(self, img, return_loss=False):
         if cuda.is_available():
@@ -107,8 +107,8 @@ class BranchyNet(nn.Module):
             return self.forward_test(img)
 
     def forward_train(self, x: Tensor) -> Tensor:
-        # x = self.preprocess(x)
-        x = self.resnet.layer1(x)
+        x = self.preprocessing(x)
+        x = self.layer1(x)
         y1 = self.earlyExit1(x)
         x = self.layer2(x)
         x = self.layer3(x)
@@ -123,7 +123,7 @@ class BranchyNet(nn.Module):
     
     def forward_test(self, x: Tensor)-> Tensor:
         
-        pdb.set_trace()
+        
 
         bs = x.size()[0]
         y = zeros(bs, 10)
@@ -133,6 +133,7 @@ class BranchyNet(nn.Module):
             y = y.to(device='cuda')
             Mask_Pass_On.to(device='cuda')
 
+        x = self.preprocessing(x)
         x = self.resnet.layer1(x)
         
         if self.activated_branches[0]:
@@ -161,7 +162,6 @@ class BranchyNet(nn.Module):
                 y_exitTwo = self.earlyExit2(x)
                 y_exitTwo = mask_up(y_exitTwo, Mask_Pass_On)
                 x = mask_up(x, Mask_Pass_On)
-                
 
                 Mask_exitTwo = max(y_exitTwo, axis=1)[0] >= 0.65
                 Mask_exitTwo = Mask_exitTwo.reshape(-1, 1)
