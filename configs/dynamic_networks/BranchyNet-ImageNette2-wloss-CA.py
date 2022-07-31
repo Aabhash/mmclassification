@@ -3,7 +3,7 @@ model = dict(
     backbone=dict(
         type='BranchyNetImagenette2',
         activated_branches=[True, True, True], pretrained=False, exit_treshholds=[0.8, 0.7],
-        log_file = "/results/BranchyNet-Imagenette/log1.txt"),
+        log_file = "results/BranchyNet-Imagenette/log1.txt"),
     head=dict(
         type='emptyClsHead',     # linear classification head，
         loss=dict(type='WeightedBranchyNetLoss',
