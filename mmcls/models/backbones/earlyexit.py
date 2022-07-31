@@ -122,6 +122,8 @@ class BranchyNet(nn.Module):
         return forward_test(self, x)
     
     def forward_test(self, x: Tensor)-> Tensor:
+        
+        pdb.set_trace()
 
         bs = x.size()[0]
         y = zeros(bs, 10)
@@ -502,8 +504,6 @@ class BranchyNetImagenette2(nn.Module):
         y = zeros(bs, 10).to(self.device)
         Mask_Pass_On = ones(bs).bool()
         Mask_Pass_On.to(self.device)
-
-        pdb.set_trace()
 
         x = self.layer1(x)
 
