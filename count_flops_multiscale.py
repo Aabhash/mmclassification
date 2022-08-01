@@ -1,10 +1,12 @@
+from numpy import block
 from mmcls.models.backbones.dn_cgnet import CGResNet
 from mmcls.models.backbones.multi_scale_dn import MultiScaleNet
 from mmcls.models.backbones.multi_scale_dn_cifar import MultiScaleNetCifar
 
 from tools.analysis_tools.flop_counter import FlopCounter
 from torch import rand
-
+import torch.nn as nn
+import torch
 from fvcore.nn import FlopCountAnalysis
 import os
 import json
@@ -34,7 +36,7 @@ def analyze_flops_msn(model, H, W, random_inp, exit_dir):
 
     print("With FlopCountAnalysis:")
     print(" _______________________________________ \n")
-    print(f"Total Flops: {flops.total() / 1e6:.4f}M,")
+    print(f"Total Flops: {flops.total() / 1e9:.4f}B,")
     print(f"Flops by Operator: {flops.by_operator()}")
     print(" _______________________________________ \n")
 
@@ -51,15 +53,54 @@ def analyze_flops_msn(model, H, W, random_inp, exit_dir):
         json.dump(result, f)
 
 
+def analyze_flops_cgn(model, H, W, exit_dir):
+    print(" _______________________________________ \n")
+    print("With flop_counter.py: ")
+    if H == 224:
+        print("Total Flops for MS-CGNet on Imagenette")
+    elif H == 32:
+        print("Total flops for MS-CGNet on Cifar10")
+
+    cls_flops, _ = fc.measure_model(model, H, W)
+
+    m = nn.Linear(in_features=64, out_features=10)
+    linear_ops = m.weight.numel() + m.bias.numel()
+    
+    total_flops = fc.get_total_flops() + linear_ops
+    cg_flops = torch.Tensor(fc.get_special_flops()).unsqueeze(dim=1)
+
+    with open(os.path.join(exit_dir, 'sparsity.json')) as f:
+        data = json.load(f)
+        val_set_sparsity = torch.Tensor(list(data.values())).unsqueeze(dim=0)
+
+    # Shape of layer x n_samples
+    exp_flops_layer_samples = torch.mul(cg_flops, val_set_sparsity)
+
+    # Shape of layer x 1
+    exp_flops_by_layer = exp_flops_layer_samples.sum(dim=1) / len(data)
+    reduced_flops = (cg_flops.T - exp_flops_by_layer).sum()
+    expected_flops = total_flops - reduced_flops
+
+    print(f"Total Flops averaged across validation set: {expected_flops / 1e9:.4f}B,")
+
+    result = {
+        'expected_flops': f'{expected_flops:,}',
+    }
+
+    with open(os.path.join(exit_dir, 'flop_analysis.json'), "w+") as f:
+        json.dump(result, f)
+
+
 if __name__ == "__main__":
 
     fc = FlopCounter()
     CGN = CGResNet(
-        18,
-        [3, 3, 3],
-        partitions=4,
-        ginit=1
-    )
+            18,
+            [3, 3, 3],
+            partitions=4,
+            ginit=0
+        )
+
     MSNC = MultiScaleNetCifar(
         growth_rate=4,
         channels=16,
@@ -94,7 +135,7 @@ if __name__ == "__main__":
         random_Imagenette,
         './results/multiscale-ranet-imagenet/'
     )
-    
+
     analyze_flops_msn(
         MSNC,
         H_Cifar,
@@ -103,24 +144,16 @@ if __name__ == "__main__":
         './results/multiscale-ranet-cifar/'
     )
 
-    print(" _______________________________________ \n")
+    analyze_flops_cgn(
+        CGN,
+        H_Imagenette,
+        W_Imagenette,
+        './results/multiscale-cgnet-imagenet/'
+    )
 
-    print("Total Flops for CGN on Imagenette")
-    # print(measure_model(CGN, H_Imagenette, W_Imagenette))
-
-    # print("CGN Imagenette")
-    # flops = FlopCountAnalysis(CGN, random_Imagenette)
-    # print(f"Total Flops: {flops.total() / 1e6:.4f}M,")
-    # print(f"Flops by Operator:", flops.by_operator())
-
-    print(" _______________________________________ \n")
-
-    print("Total Flops for CGN on Cifar")
-    # print(measure_model(CGN, H_Cifar, W_Cifar))
-
-    # print("CGN Cifar")
-    # flops = FlopCountAnalysis(CGN, random_Cifar)
-    # print(f"Total Flops: {flops.total() / 1e6:.4f}M,")
-    # print(f"Flops by Operator:", flops.by_operator())
-
-    print(" _______________________________________ \n")
+    # analyze_flops_cgn(
+    #     CGN,
+    #     H_Cifar,
+    #     W_Cifar,
+    #     './results/multiscale-cgnet-cifar/'
+    # )

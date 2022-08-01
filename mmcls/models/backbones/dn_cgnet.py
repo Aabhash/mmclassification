@@ -73,16 +73,24 @@ class CGConv2d(nn.Conv2d):
         Y = F.conv2d(input, self.weight, self.bias, self.stride,
                      self.padding, self.dilation, self.groups)
 
-        self.count_all = d.numel()
-        self.count_exit = d[d > 0].numel()
+        # self.count_exit = d[d > 0].numel()
 
         if result_dir:
             metas = kwargs.get("metas")
+
+            if 'ori_filename' in metas[0].keys():
+                key = 'ori_filename'
+            else:
+                key = None
             for i, m in enumerate(metas):
                 curr = d[i]
                 curr_all = curr.numel()
                 curr_exited = curr[curr > 0].numel()
-                self.sparsity_tracker[m['ori_filename']] = (round((curr_exited / curr_all), 4), curr_exited, curr_all)
+                if key:
+                    self.sparsity_tracker[m[key]] = (round((curr_exited / curr_all), 4))
+                else:
+                    self.sparsity_tracker[self.count_all] = (round((curr_exited / curr_all), 4))
+                self.count_all += 1
             self.write_infos(result_dir)
         return Y * d + Yp * (torch.ones_like(d) - d)
 
