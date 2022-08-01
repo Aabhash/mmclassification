@@ -1,6 +1,6 @@
 # Copyright (c) Carl. All rights reserved.
 from xmlrpc.client import Boolean, boolean
-from torch import Tensor, zeros, ones, device, cuda, logical_and, logical_not
+from torch import Tensor, zeros, ones, device, cuda, logical_or, logical_not
 import torch.nn as nn
 from torch.hub import load_state_dict_from_url
 # from torchvision.models.resnet import ResNet, Bottleneck
@@ -188,7 +188,7 @@ class BranchyNet(nn.Module):
                 
                 y += y_exitTwo    
                 
-                Mask_Pass_On = logical_not(Mask_exitTwo).reshape(-1)
+                Mask_Pass_On = logical_or(Mask_exitOne, Mask_exitTwo.reshape(-1, 1)).reshape(-1)
 
                 x = mask_down(x, Mask_Pass_On)
 
@@ -214,22 +214,20 @@ class BranchyNetImagenette2(nn.Module):
     
     """ Improved BranchyNet-Imagenette Version. """
 
-    def __init__(self, activated_branches: list, pretrained: boolean=False,
+    def __init__(self, activated_branches: list=[True, True, True],
                        exit_treshholds: list=[0.6, 0.6], log_file: Str=None):
         """activated_branches: list of which branches to use. 
                                 [True, True, True] means use all
-           pretrained: Use pretrained ResNet for the main path of the NN
            exit_treshholds: By which probability should the early
                             exits be left  
+            log_file: file for image analysis
             """
-
 
         super(BranchyNetImagenette2, self).__init__()
 
         # The variable activated branches stores which Branches to use during Test Phase
         assert(any(activated_branches))
         self.activated_branches = activated_branches.copy()
-        self.pretrained = pretrained
         self.log_file = log_file
 
         if self.activated_branches[0] == True:
@@ -243,21 +241,6 @@ class BranchyNetImagenette2(nn.Module):
             self.device = 'cpu'            
 
         self.model = ResNet_CIFAR(depth=50).to(self.device)
-        # self.model.fc = nn.Linear(2048, 10, bias=True)
-
-        # Load Pretrained Resnet 
-        if self.pretrained:
-            dirname = Path(__file__).parent.parent.parent.parent
-            resnet_path_backbone = dirname /  'work_dirs/resnet50cifar10_backbone.pth'
-
-            if not (resnet_path_backbone.is_file()):
-                sys.exit(f"class exitOne requieres pretrained resNet. {resnet_path_backbone} is no file.")
-            
-            state_dict = load(resnet_path_backbone)
-            state_dict = OrderedDict([(k.replace("backbone.", "").replace("head.", ""),v) for k,v in state_dict.items()])
-
-            self.model.load_state_dict(state_dict)
-            # save(self.model.state_dict(), resnet_path_backbone)
 
         self.layer1 = nn.Sequential(
             self.model.conv1,
@@ -353,7 +336,6 @@ class BranchyNetImagenette2(nn.Module):
             
             Mask_exitOne = max(y_exitOne, axis=1)[0] >= self.th_One
             Mask_exitOne = Mask_exitOne.reshape(-1, 1)
-            
             # If there are further exits we have to sort the bad results out
             if any(self.activated_branches[1:-1]):
                 # pdb.set_trace()
@@ -395,8 +377,7 @@ class BranchyNetImagenette2(nn.Module):
                     y_exitTwo = y_exitTwo.to(self.device)
                 y += y_exitTwo    
                 
-                Mask_Pass_On = logical_not(Mask_exitTwo).to(self.device)
-
+                Mask_Pass_On = logical_or(Mask_exitOne, Mask_exitTwo.reshape(-1, 1)).to(self.device)
                 x = mask_down(x, Mask_Pass_On).to(self.device)
 
             if self.activated_branches[-1]:
@@ -443,4 +424,3 @@ def mask_up(t: Tensor, mask: Tensor) -> Tensor:
 
     return output
     
-
