@@ -211,7 +211,7 @@ def count_flops():
         outputs = avg_flops(model, data_loader)
     print(time.time()-start_time)
 
-    print(f"{outputs} Flops where counted on average over {len(data_loader)} images.")
+    print(f"{outputs} Flops where counted on average over {len(data_loader.dataset)} images.")
 
 if __name__ == '__main__':
     count_flops()
