@@ -4,7 +4,7 @@ import torch.nn.functional as F
 from .custom_resnet_cifar import CResNet_CIFAR
 from ..builder import BACKBONES
 import json
-
+import os
 
 class CGConv2d(nn.Conv2d):
     def __init__(
@@ -56,13 +56,13 @@ class CGConv2d(nn.Conv2d):
     def gt(self, input):
         return torch.Tensor.float(torch.gt(input, torch.zeros_like(input)))
 
-    def write_infos(self, result_file):
-        with open(result_file, "w+") as f:
-            json.dump(self.sparsity_tracker, f)     
+    def write_infos(self, result_dir):
+        with open(os.path.join(result_dir, 'sparsity.json'), "w+") as f:
+            json.dump(self.sparsity_tracker, f)
 
     def forward(self, input, **kwargs):
-        
-        result_file = kwargs.get("result_file")
+
+        result_dir = kwargs.get("result_dir")
 
         Yp = F.conv2d(input, self.weight * self.mask, self.bias,
                       self.stride, self.padding, self.dilation, self.groups)
@@ -76,14 +76,14 @@ class CGConv2d(nn.Conv2d):
         self.count_all = d.numel()
         self.count_exit = d[d > 0].numel()
 
-        if result_file:
+        if result_dir:
             metas = kwargs.get("metas")
             for i, m in enumerate(metas):
                 curr = d[i]
                 curr_all = curr.numel()
                 curr_exited = curr[curr > 0].numel()
                 self.sparsity_tracker[m['ori_filename']] = (round((curr_exited / curr_all), 4), curr_exited, curr_all)
-            self.write_infos(result_file)
+            self.write_infos(result_dir)
         return Y * d + Yp * (torch.ones_like(d) - d)
 
 
@@ -100,7 +100,7 @@ class CGConv2d(nn.Conv2d):
 @BACKBONES.register_module()
 class CGResNet(CResNet_CIFAR):
     def __init__(
-            self, depth, num_blocks, in_channels=3, base_channels=16, gtarget=1.0, strides=(1, 2, 2), **kwargs):
+            self, depth, num_blocks, in_channels=3, base_channels=16, gtarget=1.0, strides=(1, 2, 2), partitions=4, ginit=0.0, alpha=4.0):
         super(CGResNet, self).__init__(
             depth,
             in_channels=in_channels,
@@ -128,9 +128,9 @@ class CGResNet(CResNet_CIFAR):
                     stride=stride,
                     padding=1,
                     bias=False,
-                    p=kwargs['partitions'],
-                    th=kwargs['ginit'],
-                    alpha=kwargs['alpha'],
+                    p=partitions,
+                    th=ginit,
+                    alpha=alpha,
                     # use_group=kwargs['use_group'],
                     # shuffle=kwargs['shuffle'],
                     # sparse_bp=kwargs['sparse_bp']

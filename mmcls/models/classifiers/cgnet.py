@@ -33,8 +33,8 @@ class CGClassifier(BaseClassifier):
             if augments_cfg is not None:
                 self.augments = Augments(augments_cfg)
 
-    def extract_feat(self, img, result_file=None, metas=None):
-        x = self.backbone(img, result_file=result_file, metas=metas)
+    def extract_feat(self, img, result_dir=None, metas=None):
+        x = self.backbone(img, result_dir=result_dir, metas=metas)
         return x
 
     def forward_train(self, img, gt_label, **kwargs):
@@ -56,7 +56,7 @@ class CGClassifier(BaseClassifier):
     def simple_test(self, img, img_metas=None, **kwargs):
         """Test without augmentation."""
         if self.get_infos:
-            x = self.extract_feat(img, result_file=self.get_infos, metas=img_metas)
+            x = self.extract_feat(img, result_dir=self.get_infos, metas=img_metas)
         else:
             x = self.extract_feat(img)
         res = self.head.simple_test(x, **kwargs)

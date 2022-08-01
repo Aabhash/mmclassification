@@ -19,6 +19,6 @@ model = dict(
         loss=dict(type='CrossEntropyLoss', loss_weight=1.0),
 
     ),
-    get_infos='./results/multiscale-cgnet/sparsity.json',
+    get_infos='./results/multiscale-cgnet/',
     pretrained=None
 )
