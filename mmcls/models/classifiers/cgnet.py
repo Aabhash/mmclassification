@@ -59,6 +59,6 @@ class CGClassifier(BaseClassifier):
             x = self.extract_feat(img, result_dir=self.get_infos, metas=img_metas)
         else:
             x = self.extract_feat(img)
-        res = self.head.simple_test(x, **kwargs)
+        res = self.head.simple_test(x, kwargs)
 
         return res
