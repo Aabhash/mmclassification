@@ -42,7 +42,7 @@ from .skipnet import ResNetFeedForwardSP
 from .skipnet_cifar import ResNetFeedForwardSP_cifar
 from .skipnet import RecurrentGatedResNet
 from .dn_cgnet import CGResNet
-from .earlyexit import BranchyNet, BranchyNetImagenette2
+from .branchynet import BranchyNet, BranchyNetImagenette2
 from .grgbnet import GRGBnet_Base
 
 
