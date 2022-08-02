@@ -5,7 +5,6 @@ from tokenize import String
 from xmlrpc.client import Boolean, boolean
 from matplotlib.ft2font import BOLD
 
-from mmcls.models.backbones.earlyexit import mask_down
 from torch import Tensor, zeros, ones, cuda
 from torch import load, save, sum, max 
 import torch.nn as nn
