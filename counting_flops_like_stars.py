@@ -3,7 +3,7 @@ from tkinter import image_names
 
 from sklearn.ensemble import GradientBoostingClassifier
 from mmcls.models.backbones.earlyexit import BranchyNetImagenette2, BranchyNet
-from tools.analysis_tools.flop_counter import *
+from tools.analysis_tools.flop_counter import FlopCounter
 from mmcls.models.backbones.grgbnet import GRGBnet_Base
 from torch import rand, cuda
 
@@ -15,6 +15,8 @@ if cuda.is_available():
     device = 'cuda'
 else:
     device = 'cpu'
+
+fc = FlopCounter()
 
 BNCF = BranchyNet(activated_branches=[True, True, True])
 BNI = BranchyNetImagenette2(activated_branches=[True, True, True])
@@ -52,13 +54,13 @@ random_Cifar_batch = rand(16, 3, H_Cifar, W_Cifar).to(device)
 print("Flop Count Analysis with flop_counter.py ")
 
 print("\n Total Flops for GRGB on Imagenette - RGB only")
-measure_model(GRGB_RGB, H_Imagenette, W_Imagenette)
+fc.measure_model(GRGB_RGB, H_Imagenette, W_Imagenette)
 
 print("\n Total Flops for GRGB on Imagenette - Greyscale only")
-measure_model(GRGB_G, H_Imagenette, W_Imagenette)
+fc.measure_model(GRGB_G, H_Imagenette, W_Imagenette)
 
 print("\n Flops for GRGB on Imagenette")
-measure_model(GRGB, H_Imagenette, W_Imagenette)
+fc.measure_model(GRGB, H_Imagenette, W_Imagenette)
 
 # Flop Count Analysis
 

@@ -363,24 +363,24 @@ class Classifier(nn.Module):
 @BACKBONES.register_module()
 class MultiScaleNet(BaseBackbone):
     def __init__(self,
-        growth_rate = 32,
-        reduction_rate = 0.5,
-        compress_factor = 0.25,
-        depths = [6, 12, 24, 16],
-        channels = 16,
-        n_scales = 3,
-        n_blocks = 2,
-        block_step = 2,
-        stepmode = "even",
-        step = 8,
-        bnwidth = [4, 2, 1],
-        gr_factor = [1, 2, 4],
-        cls_labels = 10,
-    ):
+                 growth_rate=32,
+                 reduction_rate=0.5,
+                 compress_factor=0.25,
+                 depths=[6, 12, 24, 16],
+                 channels=16,
+                 n_scales=3,
+                 n_blocks=2,
+                 block_step=2,
+                 stepmode="even",
+                 step=8,
+                 bnwidth=[4, 2, 1],
+                 gr_factor=[1, 2, 4],
+                 cls_labels=10,
+                 ):
         super().__init__()
         self.n_scales = n_scales
         self.init_layer = InitialLayer(3, channels, gr_factor, n_scales=n_scales)
-        
+
         self.classifier = nn.ModuleList()
         self.scale_flow_list = nn.ModuleList()
 
