@@ -63,6 +63,7 @@ def main():
     #ax2 = ax1.twinx()
     #ax2 = ax2.scatter(x=plot_x,y=plot_y1, color="blue")
     plt.title(title)
+    plt.savefig("{}.svg".format(title))
     #+fig.legend(models)
     plt.show()
 

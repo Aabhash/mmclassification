@@ -15,7 +15,7 @@ configs/skipnet/skipNet_rnn.py                           | skipnet_rnn.pth
 configs/resnet/resnet_18-imagenette.py                   | resnet18_imagenette.pth
 configs/resnet/resnet_50-imagenette.py                   | resnet50_imagenette.pth
 configs/resnet/resnet18_8xb16_cifar10.py                 | resnet18_b16x8_cifar10_20210528-bd6371c8.pth
-configs/resnet50_8xb16_cifar10.py                        | resnet50_b16x8_cifar10_20210528-f54bfad9.pth
+configs/resnet/resnet50_8xb16_cifar10.py                 | resnet50_b16x8_cifar10_20210528-f54bfad9.pth
 configs/BranchyNet/BranchyNet-CIFAR10.py                 |
 configs/BranchyNet/BraBranchyNet-ImageNette2-wloss-CA.py |
 configs/GRBGNet/GRGBnet-ImageNette_Base.py               |

@@ -516,7 +516,6 @@ class RecurrentGatedResNet(BaseBackbone):
                     # not add the last mask to masks
                     gprobs.append(gprob)
                     masks.append(mask.squeeze())
-        print(masks)
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
         # x = self.fc(x)
