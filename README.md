@@ -212,3 +212,5 @@ python .\tools\test.py .\configs\dynamic_subnets.py .\work_dirs\dynamic_subnets\
 ```
 python .\tools\train.py --seed 0 .\configs\dynamic_subnets.py --resume-from .\work_dirs\dynamic_subnets\epoch_7.pth
 ```
+## Explaination for the dynamic Networks
+For this porpuse an extra Readme file was created. 
