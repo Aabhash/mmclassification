@@ -48,6 +48,9 @@ The master branch works with **PyTorch 1.5+**.
   <img src="https://user-images.githubusercontent.com/9102141/87268895-3e0d0780-c4fe-11ea-849e-6140b7e0d4de.gif" width="70%"/>
 </div>
 
+## Explaination for the dynamic Networks
+For this porpuse an extra Readme file(README_dynamic.md) was created. 
+
 ### Major features
 
 - Various backbones and pretrained models
