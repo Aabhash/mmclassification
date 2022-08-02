@@ -188,7 +188,7 @@ class BranchyNet(nn.Module):
                 
                 y += y_exitTwo    
                 
-                Mask_Pass_On = logical_or(Mask_exitOne, Mask_exitTwo.reshape(-1, 1)).reshape(-1)
+                Mask_Pass_On = logical_not(logical_or(Mask_exitOne, Mask_exitTwo.reshape(-1, 1))).reshape(-1)
 
                 x = mask_down(x, Mask_Pass_On)
 
@@ -376,9 +376,7 @@ class BranchyNetImagenette2(nn.Module):
                     y_exitTwo = y_exitTwo.to(self.device)
                 y += y_exitTwo    
                 
-                # For the third exit we take all vectors that have not been dealt with in the first 
-                # two passes.
-                Mask_Pass_On = logical_or(Mask_exitOne, Mask_exitTwo.reshape(-1, 1)).to(self.device)
+                Mask_Pass_On = logical_not(logical_or(Mask_exitOne, Mask_exitTwo.reshape(-1, 1))).to(self.device)
                 x = mask_down(x, Mask_Pass_On).to(self.device)
 
             if self.activated_branches[-1]:

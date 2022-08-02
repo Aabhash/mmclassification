@@ -8,7 +8,7 @@ from .base_head import BaseHead
 from operator import itemgetter
 import json
 import time
-
+import os
 
 @HEADS.register_module()
 class MultiScaleHead(BaseHead):
@@ -41,8 +41,9 @@ class MultiScaleHead(BaseHead):
         self.total_time = 0
 
 
-    def write_infos(self, result_file):
-        with open(result_file, "w+") as f:
+    def write_infos(self, result_dir):
+        self.exit_tracker['meta'] = self.exits
+        with open(os.path.join(result_dir, 'exits.json'), "w+") as f:
             json.dump(self.exit_tracker, f)
 
 
@@ -76,14 +77,14 @@ class MultiScaleHead(BaseHead):
         return self.loss(cls_score, gt_label, **kwargs)
 
 
-    def simple_test(self, x, post_process=True, result_file=None, **kwargs):
+    def simple_test(self, x, post_process=True, result_dir=None, **kwargs):
         # st = time.time()
         # if isinstance(x, tuple):
             # x = x[-1]
 
         metas = kwargs.get("img_metas", None)
-        if result_file:
-            metas = [m['ori_filename'] for m in metas]
+        if metas:
+            metas = [m.get('ori_filename', "") for m in metas]
 
         pred = torch.zeros_like(x[-1])
         left_to_track_idx = torch.arange(x[-1].shape[0])
@@ -99,9 +100,10 @@ class MultiScaleHead(BaseHead):
                 left_to_track_idx = left_to_track_idx[max_preds.le(self.T[k]).nonzero(as_tuple=True)]
 
                 pred[og_idx] = logits[curr_idx]
-                for id in og_idx:
-                    self.exit_tracker[k].append(metas[id])
-                    self.exits[k] += 1
+                if metas:
+                    for id in og_idx:
+                        self.exit_tracker[k].append(metas[id])
+                        self.exits[k] += 1
                 # try:
                     # self.exit_tracker[k].append(itemgetter(*og_idx)(metas))
                 # except TypeError:
@@ -109,8 +111,8 @@ class MultiScaleHead(BaseHead):
             else:
                 break
     
-        if result_file:
-            self.write_infos(result_file)
+        if result_dir:
+            self.write_infos(result_dir)
 
         # pred = []
         # for k, out in enumerate(x):

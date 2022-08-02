@@ -69,7 +69,7 @@ class BaseClassifier(BaseModule, metaclass=ABCMeta):
             raise NotImplementedError('aug_test has not been implemented')
 
     @auto_fp16(apply_to=('img', ))
-    def forward(self, img, return_loss=False, **kwargs):
+    def forward(self, img, return_loss=True, **kwargs):
         """Calls either forward_train or forward_test depending on whether
         return_loss=True.
 
