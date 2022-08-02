@@ -56,6 +56,6 @@ class MultiScaleClassifier(BaseClassifier):
     def simple_test(self, img, **kwargs):
         """Test without augmentation."""
         x = self.extract_feat(img)
-        res = self.head.simple_test(x, result_file=self.get_infos, **kwargs)
+        res = self.head.simple_test(x, result_dir=self.get_infos, **kwargs)
 
         return res
