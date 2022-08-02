@@ -195,7 +195,6 @@ class FeedforwardGateII(BaseModule):
         # discretize
         x = (softmax[:, 1] > 0.5).float().detach() - \
             softmax[:, 1].detach() + softmax[:, 1]
-        #x = x[None, :] #only for flops
         x = x.view(x.size(0), 1, 1, 1)
         return x, logprob
 

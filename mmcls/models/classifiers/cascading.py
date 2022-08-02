@@ -47,7 +47,7 @@ class Cascading(BaseClassifier):
         self.PSI = 0
         self.PSI_delta = 0
         self.augments = None
-        self.get_infos = "cascading_info"
+        self.get_infos = None
         if train_cfg is not None:
             augments_cfg = train_cfg.get('augments', None)
             if augments_cfg is not None:
@@ -107,6 +107,7 @@ class Cascading(BaseClassifier):
         res = self.extract_feat(img,self.little,neck=self.little_neck,head=self.little_head)
         res = self.little_head.simple_test(res)
         score = torch.tensor(np.array(res)).topk(2).values.transpose(1,0)
+        
         sm = score[0]- score[1]
         mask_1 = torch.nonzero((sm) < self.threshold) #need <
        
@@ -137,7 +138,7 @@ class Cascading(BaseClassifier):
             img_min = img_min.view(img_min.shape[0],im_shape[1],im_shape[2],im_shape[3])
             res_big = self.extract_feat(img_min,self.big, neck=self.big_neck, head=self.big_head)
             res_big = self.big_head.simple_test(res_big)
-            score_big = torch.tensor(np.array(res)).topk(2).values.transpose(1,0)
+            score_big =  torch.tensor(np.array(res)).topk(2).values.transpose(1,0)
             sm_big = score_big[0]- score_big[1]
             #maybe there are more elegant ways
             
@@ -168,8 +169,7 @@ class Cascading(BaseClassifier):
            
             self.threshold = self.threshold + self.delta
             self.delta = -self.delta
-        return res
-        
+        return torch.tensor(np.array(res))
 
    
 

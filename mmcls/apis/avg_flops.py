@@ -21,7 +21,7 @@ def avg_flops(model, data_loader):
         img = data['img']
         batch_size = img.size(0)
         with torch.no_grad():
-            flops += FlopCountAnalysis(model, img).total()
+            flops += FlopCountAnalysis(model.cuda(), img.cuda()).total()
         if i % 40 == 0:
             enablePrint()
             print(f"Batch {i} done")

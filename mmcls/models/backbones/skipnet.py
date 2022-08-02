@@ -194,7 +194,7 @@ class FeedforwardGateII(BaseModule):
         return x, logprob
 
 
-def writeInfos(masks, result_file):
+def writeInfos(masks, result_file, kwargs):
     f = open(result_file, "a")
     masks = torch.stack(masks).T
     for i, img in enumerate(masks):
