@@ -62,11 +62,14 @@ def analyze_flops_cgn(model, H, W, exit_dir):
         print("Total flops for MS-CGNet on Cifar10")
 
     cls_flops, _ = fc.measure_model(model, H, W)
+    flops = FlopCountAnalysis(model, rand(1, 3, H, W))
 
     m = nn.Linear(in_features=64, out_features=10)
     linear_ops = m.weight.numel() + m.bias.numel()
     
-    total_flops = fc.get_total_flops() + linear_ops
+    # total_flops = fc.get_total_flops() + linear_ops
+    total_flops = flops.total() + linear_ops
+
     cg_flops = torch.Tensor(fc.get_special_flops()).unsqueeze(dim=1)
 
     with open(os.path.join(exit_dir, 'sparsity.json')) as f:
