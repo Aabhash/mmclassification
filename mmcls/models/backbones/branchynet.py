@@ -151,8 +151,8 @@ class BranchyNet(nn.Module):
             Mask_Pass_On = (Mask_exitOne < .5).reshape(-1)
 
             if self.log_file:
-                    # Here the logging of the Exits of different Images takes Place
-                    # Assuming that the image names are written elsewhere in the training loop
+                    # Here the logging of the exits of different images takes place,
+                    # assuming that the image names are written elsewhere in the training loop.
                     file_object = open(self.log_file, 'a')
                     file_object.write(str(Mask_exitOne))
                     file_object.close() 
@@ -173,8 +173,8 @@ class BranchyNet(nn.Module):
                 Mask_exitTwo = Mask_exitTwo.reshape(-1, 1)
                 
                 if self.log_file:
-                    # Here the logging of the Exits of different Images takes Place
-                    # Assuming that the image names are written elsewhere in the training loop
+                    # Here the logging of the exits of different images takes place,
+                    # assuming that the image names are written elsewhere in the training loop.
                     file_object = open(self.log_file, 'a')
                     file_object.write(str(Mask_exitTwo))
                     file_object.close() 
@@ -194,8 +194,8 @@ class BranchyNet(nn.Module):
 
             if self.activated_branches[-1]:
                 if self.log_file:
-                    # Here the logging of the Exits of different Images takes Place
-                    # Assuming that the image names are written elsewhere in the training loop
+                    # Here the logging of the exits of different images takes place,
+                    # assuming that the image names are written elsewhere in the training loop.
                     file_object = open(self.log_file, 'a')
                     file_object.write(str(Mask_Pass_On))
                     file_object.close() 
@@ -338,13 +338,12 @@ class BranchyNetImagenette2(nn.Module):
             Mask_exitOne = Mask_exitOne.reshape(-1, 1)
             # If there are further exits we have to sort the bad results out
             if any(self.activated_branches[1:-1]):
-                # pdb.set_trace()
                 y_exitOne = y_exitOne * Mask_exitOne
             y += y_exitOne.to(self.device)    
 
             if self.log_file:
-                    # Here the logging of the Exits of different Images takes Place
-                    # Assuming that the image names are written elsewhere in the training loop
+                    # Here the logging of the exits of different images takes place,
+                    # assuming that the image names are written elsewhere in the training loop.
                     file_object = open(self.log_file, 'a')
                     file_object.write(str(Mask_exitOne))
                     file_object.close() 
@@ -365,8 +364,8 @@ class BranchyNetImagenette2(nn.Module):
                 Mask_exitTwo = Mask_exitTwo.to(self.device)
 
                 if self.log_file:
-                    # Here the logging of the Exits of different Images takes Place
-                    # Assuming that the image names are written elsewhere in the training loop
+                    # Here the logging of the exits of different images takes place,
+                    # assuming that the image names are written elsewhere in the training loop.
                     file_object = open(self.log_file, 'a')
                     file_object.write(str(Mask_exitTwo))
                     file_object.close() 
@@ -377,14 +376,16 @@ class BranchyNetImagenette2(nn.Module):
                     y_exitTwo = y_exitTwo.to(self.device)
                 y += y_exitTwo    
                 
+                # For the third exit we take all vectors that have not been dealt with in the first 
+                # two passes.
                 Mask_Pass_On = logical_or(Mask_exitOne, Mask_exitTwo.reshape(-1, 1)).to(self.device)
                 x = mask_down(x, Mask_Pass_On).to(self.device)
 
             if self.activated_branches[-1]:
 
                 if self.log_file:
-                    # Here the logging of the Exits of different Images takes Place
-                    # Assuming that the image names are written elsewhere in the training loop
+                    # Here the logging of the exits of different images takes place,
+                    # assuming that the image names are written elsewhere in the training loop.
                     file_object = open(self.log_file, 'a')
                     file_object.write(str(Mask_Pass_On))
                     file_object.close() 
@@ -400,7 +401,9 @@ class BranchyNetImagenette2(nn.Module):
 
 
 def mask_down(t: Tensor, mask: Tensor) -> Tensor:
-    
+    '''This method takes a vector and downsizes it, such that the new tensor
+        has lost its 0-lines'''
+
     mask = mask.reshape(-1)
     if cuda.is_available():
         mask=mask.to('cuda')
@@ -408,8 +411,8 @@ def mask_down(t: Tensor, mask: Tensor) -> Tensor:
     return t[mask.bool()]
 
 def mask_up(t: Tensor, mask: Tensor) -> Tensor:
-    '''This method takes a downsized vector and upsizes it again, so that the new tensor
-        has its values where the mask has its Ones.'''
+    '''This method takes a downsized vector and upsizes it again, such that the new tensor
+        has its values where the mask has its 1's and 0's where the mask has 0's.'''
     mask = mask.reshape(-1)
     if cuda.is_available():
         mask=mask.to('cuda')

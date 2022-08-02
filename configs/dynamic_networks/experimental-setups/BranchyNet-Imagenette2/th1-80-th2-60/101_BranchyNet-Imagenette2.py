@@ -2,7 +2,7 @@ model = dict(
     type='EarlyExitClassifier',
     backbone=dict(
         type='BranchyNetImagenette2',
-        activated_branches=[True, False, True], pretrained=False, exit_treshholds=[0.8, 0.6]),
+        activated_branches=[True, False, True], exit_treshholds=[0.8, 0.6]),
     head=dict(
         type='emptyClsHead',     # linear classification head，
         loss=dict(type='WeightedBranchyNetLoss',
