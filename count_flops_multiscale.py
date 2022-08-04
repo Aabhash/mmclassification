@@ -115,7 +115,7 @@ if __name__ == "__main__":
     )
     MSN = MultiScaleNet(
         growth_rate=16,
-        channels=64,
+        channels=32,
         n_scales=4,
         n_blocks=2,
         step=8,
