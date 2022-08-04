@@ -150,6 +150,8 @@ class CGResNet(CResNet_CIFAR):
         out = self.layer1(out, **kwargs)
         out = self.layer2(out, **kwargs)
         out = self.layer3(out, **kwargs)
-        out = F.avg_pool2d(out, out.size()[3])
+        size = int(out.size()[3])
+        out = F.avg_pool2d(out, size)
+        # out = F.avg_pool2d(out, out.size()[3])
         out = out.view(out.size(0), -1)
         return out

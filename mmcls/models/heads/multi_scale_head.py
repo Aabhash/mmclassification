@@ -34,7 +34,7 @@ class MultiScaleHead(BaseHead):
         self.simple_softmax = nn.Softmax(dim=0).cuda()
 
         # self.T = torch.Tensor([0.65] * (num_exits-1) + [0])
-        self.T = torch.hstack((torch.linspace(0.8, 0.5, (num_exits-1)), torch.tensor([0])))
+        self.T = torch.hstack((torch.linspace(0.96, 0.75, (num_exits-1)), torch.tensor([0])))
 
         self.exit_tracker = {ncls:[] for ncls in range(num_exits)}
         self.exits = {ncls:0 for ncls in range(num_exits)}
@@ -84,7 +84,7 @@ class MultiScaleHead(BaseHead):
 
         metas = kwargs.get("img_metas", None)
         if metas:
-            metas = [m.get('ori_filename', "") for m in metas]
+            metas = [m.get('ori_filename', 1) for m in metas]
 
         pred = torch.zeros_like(x[-1])
         left_to_track_idx = torch.arange(x[-1].shape[0])

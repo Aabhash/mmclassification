@@ -1,1 +1,1 @@
-{"expected_flops": "836,266,112.0"}
+{"total_flops_without_cg": "1,901,068,938", "exit_flops": "836,266,112.0"}

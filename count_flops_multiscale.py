@@ -43,7 +43,7 @@ def analyze_flops_msn(model, H, W, random_inp, exit_dir):
     rounder = lambda x: f'{x:,}'
     result = {
         'flop_by_exit': [rounder(c) for c in cls_flops],
-        'expected_flops': rounder(expected_flops),
+        'exit_flops': rounder(expected_flops),
         'total_flop_FP': rounder(sum(cls_flops)),
         'last_flop_FCA': rounder(flops.total()),
         'flop_by_operator': flops.by_operator()
@@ -66,9 +66,9 @@ def analyze_flops_cgn(model, H, W, exit_dir):
 
     m = nn.Linear(in_features=64, out_features=10)
     linear_ops = m.weight.numel() + m.bias.numel()
-    
-    # total_flops = fc.get_total_flops() + linear_ops
-    total_flops = flops.total() + linear_ops
+
+    total_flops = fc.get_total_flops() + linear_ops
+    # total_flops = flops.total() + linear_ops
 
     cg_flops = torch.Tensor(fc.get_special_flops()).unsqueeze(dim=1)
 
@@ -87,7 +87,8 @@ def analyze_flops_cgn(model, H, W, exit_dir):
     print(f"Total Flops averaged across validation set: {expected_flops / 1e9:.4f}B,")
 
     result = {
-        'expected_flops': f'{expected_flops:,}',
+        'total_flops_without_cg': f'{total_flops:,}',
+        'exit_flops': f'{expected_flops:,}',
     }
 
     with open(os.path.join(exit_dir, 'flop_analysis.json'), "w+") as f:
@@ -105,8 +106,8 @@ if __name__ == "__main__":
         )
 
     MSNC = MultiScaleNetCifar(
-        growth_rate=4,
-        channels=16,
+        growth_rate=8,
+        channels=32,
         n_scales=3,
         n_blocks=2,
         step=4,
@@ -114,7 +115,7 @@ if __name__ == "__main__":
     )
     MSN = MultiScaleNet(
         growth_rate=16,
-        channels=32,
+        channels=64,
         n_scales=4,
         n_blocks=2,
         step=8,
