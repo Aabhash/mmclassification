@@ -19,10 +19,10 @@ configs/resnet/resnet50_8xb16_cifar10.py                 | resnet50_b16x8_cifar1
 configs/BranchyNet/BranchyNet-CIFAR10.py                 |
 configs/BranchyNet/BraBranchyNet-ImageNette2-wloss-CA.py |
 configs/GRBGNet/GRGBnet-ImageNette_Base.py               |
-confgis/CGNet/dynamic-cgnet-cifar10.py                   |
-confgis/CGNet/dynamic-cgnet-imagenet.py                  |
-confgis/RANet/dynamic-ranet-imagenet.py                  |
-confgis/RANet/dynamic-ranet-cifar10.py                   |
+confgis/CGNet/dynamic-cgnet-cifar10.py                   | dynamic-cgnet-cifar.pth
+confgis/CGNet/dynamic-cgnet-imagenet.py                  | dynamic-cgnet-imagenet.pth
+confgis/RANet/dynamic-ranet-imagenet.py                  | dynamic-ranet-cifar.pth
+confgis/RANet/dynamic-ranet-cifar10.py                   | dynamic-ranet-imagenet.pth
 
 
 
